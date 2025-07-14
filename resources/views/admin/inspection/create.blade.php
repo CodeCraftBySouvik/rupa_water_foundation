@@ -11,12 +11,13 @@
         <div class="col-md-12">
 
             <div class="card shadow-sm">
-                <div class="card-header bg-white align-items-center">
-                    <h6 class="mb-0">Inspection</h6>
-                    <a href="{{route('inspection.index')}}" class="btn btn-primary btn-sm ms-auto">Back</a>
-                </div>
-                <form method="POST" action="{{route('inspection.store') }}">
+              
+                <form role="form" method="POST" action="{{route('inspection.store') }}">
                     @csrf
+                    <div class="card-header bg-white align-items-center">
+                        <h6 class="mb-0">Inspection</h6>
+                        <a href="{{route('inspection.index')}}" class="btn btn-primary btn-sm ms-auto">Back</a>
+                    </div>
                     <div class="card-body">
 
                         {{-- Top two fields ---------------------------------------------------- --}}
@@ -27,13 +28,11 @@
                                     class="form-control">
                             </div>
                             <div class="col-4">
-                                <label class="form-label">Checked&nbsp;By</label>
-                                <input type="text" name="checked_by" value="{{ old('checked_by') }}"
-                                    class="form-control">
+                                @error('checked_by') <p class="text-danger small">{{ $message }}</p> @enderror
                             </div>
                             <div class="col-4">
                                 <label class="form-label">Location</label>
-                                <select name="location_id" class="form-select">
+                                <select name="location_id" id="locationSelect" class="form-select js-single-select">
                                     <option value="">-- Select Location --</option>
                                     @foreach($locations as $id => $title)
                                         <option value="{{ $id }}" {{ old('location_id') == $id ? 'selected' : '' }}>
@@ -42,7 +41,6 @@
                                     @endforeach
                                 </select>
                                 @error('location_id') <p class="text-danger small">{{ $message }}</p> @enderror
-                            </div>
                         </div>
 
                         {{-- field helper for pill radios --}}
@@ -104,7 +102,7 @@
                                 {!! pill('tap_glass_condition','present','Present',old('tap_glass_condition')) !!}
                                 {!! pill('tap_glass_condition','not
                                 present','Not&nbsp;Present',old('tap_glass_condition')) !!}
-                                @error('cleanliness')
+                                @error('tap_glass_condition')
                                 <p class="text-danger small">{{$message}}</p>
                                 @enderror
                             </div>
@@ -168,10 +166,31 @@
                         <button class="btn btn-danger btn-sm">Save and Continue</button>
 
                     </div>
+                </form>
             </div>
-
         </div>
     </div>
-    </form>
+   
 </div>
+@endsection
+@section('scripts')
+<script>
+    // for location
+$(document).ready(function(){
+    $('.js-single-select').select2({
+        placeholder: "-- Select Location --",
+        allowClear: true,
+        width: '100%' 
+    });
+});
+
+//for user
+$(document).ready(function(){
+    $('.js-single-select-user').select2({
+        placeholder: "-- Select User --",
+        allowClear: true,
+        width: '100%' 
+    });
+});
+</script>
 @endsection

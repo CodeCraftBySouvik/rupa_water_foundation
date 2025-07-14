@@ -31,7 +31,7 @@
                                         <img src="{{ asset($img) }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Gallery image {{ $index+1 }}">
 
                                         {{--  delete / close button --}}
-                                        <form method="POST"
+                                        <form id="form-{{ $item->id }}-{{ $index }}" method="POST"
                                             action="{{route('gallery.image.delete',[$item->id,$index])}}"
                                             class="position-absolute top-0 end-0 m-1">
                                             @csrf
@@ -39,12 +39,15 @@
                                             <button type="submit" onclick="return confirm('Delete this image?')"
                                                 class="btn btn-danger btn-sm d-flex align-items-center justify-content-center p-0"
                                                 style="width:24px;height:24px;line-height:0;">
-                                                X
                                                 {{-- <i class="fa fa-times text-white small"></i> --}}
+                                            {{-- </button> --}}
+
+                                            <button type="button" class="btn btn-danger btn-sm delete-image-button"
+                                                data-form-id="form-{{ $item->id }}-{{$index}}" style="width:24px;height:24px;line-height:0;">
+                                                X</button>
                                             </button>
                                         </form>
 
-                                    </div>
                                 </div>
                                 @endforeach
                             </div>
@@ -86,4 +89,31 @@
     </div>
     {{-- @include('layouts.footers.auth.footer') --}}
 </div>
+@endsection
+@section('scripts')
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.delete-image-button').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const formId = this.dataset.formId;
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This image will be deleted permanently.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, delete it!',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById(formId).submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
 @endsection

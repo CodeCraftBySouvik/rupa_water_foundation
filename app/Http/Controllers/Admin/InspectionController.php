@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Inspection;
-use App\Models\Location;
+use App\Models\{Location, User};
 
 class InspectionController extends Controller
 {
@@ -37,11 +37,43 @@ class InspectionController extends Controller
 
     public function create(){
         $locations = Location::pluck('title','id');
-        return view('admin.inspection.create',compact('locations'));
+        $checkUser = User::pluck('name', 'id');
+        return view('admin.inspection.create',compact('locations', 'checkUser'));
     }
 
     public function store(Request $request){
-        $request->validate($this->rules());
+       // dd($request->all());
+        $validated = $request->validate($this->rules());
+        Inspection::create($validated);
+
+        return redirect()->route('inspection.index')->with('success', 'Inspection saved successfully!');
+    }
+
+    public function edit($id)
+    {
+        $inspection = Inspection::findOrFail($id);
+        $locations = Location::pluck('title', 'id'); // Adjust if needed
+        $checkUser = User::pluck('name', 'id');      // Adjust if needed
+       // dd($inspection);
+
+        return view('admin.inspection.edit', compact('inspection', 'locations', 'checkUser'));
+    }
+
+    public function update(Request $request)
+    {
+        //dd($request->all());
+        $request->validate([
+            'id' => 'required|exists:inspections,id',
+            'checked_by' => 'required|exists:users,id',
+            'location_id' => 'required|exists:locations,id',
+            'checked_date' => 'required|date',
+            
+        ]);
+
+        $inspection = Inspection::findOrFail($request->id);
+        $inspection->update($request->except(['_token']));
+
+        return redirect()->route('inspection.index')->with('success', 'Inspection updated successfully.');
     }
 
 

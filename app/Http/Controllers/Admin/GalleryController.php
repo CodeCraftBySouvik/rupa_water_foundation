@@ -36,19 +36,33 @@ class GalleryController extends Controller
         return back()->with('success', 'Gallery saved with multiple images!');
     }
 
-     public function deleteImage(Gallery $gallery, $index)
+    public function deleteImage(Gallery $gallery, $index)
     {
         $paths = explode(',', $gallery->image_path);
         $file  = $paths[$index] ?? null;
         unset($paths[$index]);
 
-        $gallery->update(['image_path' => implode(',', $paths)]);
+        //Remove empty values and reindex
+        $paths = array_values(array_filter($paths));
+
+        // $gallery->update(['image_path' => implode(',', $paths)]);
 
         if ($file && file_exists(public_path($file))) {
             unlink(public_path($file));
         }
 
-        return back()->with('success', 'Image deleted.');
+        if(count($paths) === 0){
+            //all images deleted then gallery records too
+            $gallery->delete();
+
+            return back()->with('success', 'Image and gallery deleted');
+        } else{
+            $gallery->update(['image_path' => implode(',', $paths)]);
+
+            return back()->with('success', 'Image deleted.');
+        }
+
+        
     }
 
 

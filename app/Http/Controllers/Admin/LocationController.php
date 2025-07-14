@@ -50,7 +50,7 @@ class LocationController extends Controller
 
     public function location_update(Request $request){
         $request->validate([
-            'location_id'   => ['required', 'string', 'max:50', Rule::unique('locations', 'location_id')],
+            'location_id'   => ['required', 'string', 'max:50', Rule::unique('locations', 'location_id')->ignore($request->id)],
             'title'         => 'required|string|max:255',
             'address'       => 'required|string|max:500',
             'location_type' => ['nullable', Rule::in(['roadside', 'complex'])],
@@ -70,7 +70,7 @@ class LocationController extends Controller
          $locationUpdate->position = $request->position;
          $locationUpdate->opening_date = $request->opening_date;
         $locationUpdate->save();
-        return redirect()->route('location.index')->with('success','Location created successfully.');
+        return redirect()->route('location.index')->with('success','Location updated successfully.');
 
     }
 

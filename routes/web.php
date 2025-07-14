@@ -13,7 +13,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ChangePassword;            
-use App\Http\Controllers\Admin\{AboutUsController,GalleryController,LocationController,InspectionController};            
+use App\Http\Controllers\Admin\{AboutUsController,GalleryController,LocationController,InspectionController,UserController};            
             
 
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
@@ -50,6 +50,11 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/gallery', [GalleryController::class, 'gallery'])->name('gallery.index');
 	Route::post('/gallery-store', [GalleryController::class, 'store'])->name('gallery.store');
 	Route::post('/gallery/{gallery}/{index}', [GalleryController::class, 'deleteImage'])->name('gallery.image.delete');
+	//User
+	Route::get('/user', [UserController::class, 'index'])->name('user.index');
+	Route::get('/user-create-form', [UserController::class, 'create'])->name('user.create');
+	Route::post('/user-store', [UserController::class, 'store'])->name('user.store');
+	
 	// Location
 	Route::get('/location', [LocationController::class, 'location'])->name('location.index');
 	Route::get('/location-create-form', [LocationController::class, 'location_create_form'])->name('location.create');
@@ -59,9 +64,11 @@ Route::group(['middleware' => 'auth'], function () {
 
 	// Inspection
 	Route::prefix('inspection') ->name('inspection.')->group(function () {
-	   Route::get('/', [InspectionController::class, 'index'])->name('index');
-	   Route::get('/create', [InspectionController::class, 'create'])->name('create');
-	   Route::post('/store', [InspectionController::class, 'store'])->name('store');
+		Route::get('/', [InspectionController::class, 'index'])->name('index');
+		Route::get('/create', [InspectionController::class, 'create'])->name('create');
+		Route::post('/store', [InspectionController::class, 'store'])->name('store');
+		Route::get('/edit-form/{id}', [InspectionController::class, 'edit'])->name('edit');
+		Route::post('/update', [InspectionController::class, 'update'])->name('update');
 	});
 	
 });

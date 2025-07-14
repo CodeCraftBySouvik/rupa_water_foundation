@@ -10,8 +10,8 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-5 text-center mx-auto">
                         <h1 class="text-white mb-2 mt-5">Welcome!</h1>
-                        <p class="text-lead text-white">Use these awesome forms to login or create new account in your
-                            project for free.</p>
+                        {{-- <p class="text-lead text-white">Use these awesome forms to login or create new account in your
+                            project for free.</p> --}}
                     </div>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                             <h5>Register with</h5>
                         </div>
                         <div class="row px-xl-5 px-sm-4 px-3">
-                            <div class="col-3 ms-auto px-1">
+                            {{-- <div class="col-3 ms-auto px-1">
                                 <a class="btn btn-outline-light w-100" href="javascript:;">
                                     <svg width="24px" height="32px" viewBox="0 0 64 64" version="1.1">
                                         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -38,8 +38,8 @@
                                         </g>
                                     </svg>
                                 </a>
-                            </div>
-                            <div class="col-3 px-1">
+                            </div> --}}
+                            {{-- <div class="col-3 px-1">
                                 <a class="btn btn-outline-light w-100" href="javascript:;">
                                     <svg width="24px" height="32px" viewBox="0 0 64 64" version="1.1">
                                         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -73,13 +73,13 @@
                                         </g>
                                     </svg>
                                 </a>
-                            </div>
-                            <div class="mt-2 position-relative text-center">
+                            </div> --}}
+                            {{-- <div class="mt-2 position-relative text-center">
                                 <p
                                     class="text-sm font-weight-bold mb-2 text-secondary text-border d-inline z-index-2 bg-white px-3">
                                     or
                                 </p>
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="card-body">
                             <form method="POST" action="{{ route('register.perform') }}">
