@@ -28,6 +28,15 @@
                                     class="form-control">
                             </div>
                             <div class="col-4">
+                                <label class="form-label">Checked&nbsp;By</label>                              
+                                    <select name="checked_by" id="userSelect" class="form-select js-single-select-user">
+                                    <option value="">-- Select User --</option>
+                                    @foreach($checkUser as $id => $name)
+                                        <option value="{{ $id }}" {{ old('checked_by') == $id ? 'selected' : '' }}>
+                                            {{ ucwords($name) }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 @error('checked_by') <p class="text-danger small">{{ $message }}</p> @enderror
                             </div>
                             <div class="col-4">
@@ -41,6 +50,7 @@
                                     @endforeach
                                 </select>
                                 @error('location_id') <p class="text-danger small">{{ $message }}</p> @enderror
+                            </div>
                         </div>
 
                         {{-- field helper for pill radios --}}
@@ -163,7 +173,7 @@
                             <textarea name="notes" rows="3" class="form-control">{{ old('notes') }}</textarea>
                         </div>
 
-                        <button class="btn btn-danger btn-sm">Save and Continue</button>
+                        <button class="btn btn-primary btn-sm">Save and Continue</button>
 
                     </div>
                 </form>

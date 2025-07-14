@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -51,20 +52,14 @@
     @endauth
 
     <!--   Core JS Files   -->
-<<<<<<< HEAD
-=======
     <script src="{{asset('assets/js/jquery-3.6.0.min.js')}}"></script>
     <script src="{{asset('assets/js/select2.min.js')}}"></script>
->>>>>>> ea770df381e42ab2ff7a1abafb07fb2f77f66221
     <script src="{{asset('assets/js/core/popper.min.js')}}"></script>
     <script src="{{asset('assets/js/core/bootstrap.min.js')}}"></script>
     <script src="{{asset('assets/js/plugins/perfect-scrollbar.min.js')}}"></script>
     <script src="{{asset('assets/js/plugins/smooth-scrollbar.min.js')}}"></script>
-<<<<<<< HEAD
-=======
     <!-- Sweetalert -->
     <script src="{{asset('assets/js/sweetalert2@11.js')}}"></script>
->>>>>>> ea770df381e42ab2ff7a1abafb07fb2f77f66221
     <script>
         var win = navigator.platform.indexOf('Win') > -1;
         if (win && document.querySelector('#sidenav-scrollbar')) {
