@@ -13,7 +13,10 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
     <!-- Nucleo Icons -->
     <link href="{{asset('assets/css/nucleo-icons.css')}}" rel="stylesheet" />
-    <link href="{{asset('assets/css/nucleo-svg.css')}}" rel="stylesheet" />
+    <!-- password eye Icons -->
+    <link href="{{asset('assets/css/all.min.css')}}" rel="stylesheet" />
+    <!-- select2 eye Icons -->
+    <link href="{{asset('assets/css/select2.min.css')}}" rel="stylesheet" />
     <!-- Font Awesome Icons -->
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link href="{{asset('assets/css/nucleo-svg.css')}}" rel="stylesheet" />
@@ -48,6 +51,8 @@
     @endauth
 
     <!--   Core JS Files   -->
+    <script src="{{asset('assets/js/jquery-3.6.0.min.js')}}"></script>
+    <script src="{{asset('assets/js/select2.min.js')}}"></script>
     <script src="{{asset('assets/js/core/popper.min.js')}}"></script>
     <script src="{{asset('assets/js/core/bootstrap.min.js')}}"></script>
     <script src="{{asset('assets/js/plugins/perfect-scrollbar.min.js')}}"></script>

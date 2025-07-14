@@ -70,7 +70,7 @@ class LocationController extends Controller
          $locationUpdate->position = $request->position;
          $locationUpdate->opening_date = $request->opening_date;
         $locationUpdate->save();
-        return redirect()->route('location.index')->with('success','Location created successfully.');
+        return redirect()->route('location.index')->with('success','Location updated successfully.');
 
     }
 

@@ -52,6 +52,8 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/gallery/{gallery}/{index}', [GalleryController::class, 'deleteImage'])->name('gallery.image.delete');
 	//User
 	Route::get('/user', [UserController::class, 'index'])->name('user.index');
+	Route::get('/user-create-form', [UserController::class, 'create'])->name('user.create');
+	Route::post('/user-store', [UserController::class, 'store'])->name('user.store');
 	
 	// Location
 	Route::get('/location', [LocationController::class, 'location'])->name('location.index');
@@ -62,9 +64,11 @@ Route::group(['middleware' => 'auth'], function () {
 
 	// Inspection
 	Route::prefix('inspection') ->name('inspection.')->group(function () {
-	   Route::get('/', [InspectionController::class, 'index'])->name('index');
-	   Route::get('/create', [InspectionController::class, 'create'])->name('create');
-	   Route::post('/store', [InspectionController::class, 'store'])->name('store');
+		Route::get('/', [InspectionController::class, 'index'])->name('index');
+		Route::get('/create', [InspectionController::class, 'create'])->name('create');
+		Route::post('/store', [InspectionController::class, 'store'])->name('store');
+		Route::get('/edit-form/{id}', [InspectionController::class, 'edit'])->name('edit');
+		Route::post('/update', [InspectionController::class, 'update'])->name('update');
 	});
 	
 });

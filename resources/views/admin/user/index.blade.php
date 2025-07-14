@@ -11,7 +11,7 @@
                 </div>
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6>User List</h6>
-                    <a href="#" class="btn btn-primary btn-sm">Add Location</a>
+                    <a href="{{route('user.create')}}"  class="btn btn-primary btn-sm">Add User</a>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
@@ -48,9 +48,8 @@
                                     <td class="align-middle text-center text-sm">
                                         <span class="badge badge-sm bg-gradient-success">{{$data->mobile}}</span>
                                     </td>
-                                    <td class="align-middle text-center">
-                                        <span
-                                            class="text-secondary text-xs font-weight-bold">{{$data->email}}</span>
+                                    <td class="align-middle text-center">                                       
+                                        <span class="text-secondary text-xs font-weight-bold">{{$data->email}}</span>
                                     </td>
                                     {{-- <td class="align-middle">
                                         <a href="#" class="btn btn-dark btn-sm mt-1">

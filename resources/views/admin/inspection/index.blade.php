@@ -33,7 +33,7 @@
                                 Cleanliness</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                 Checked By</th>
-                            <th class="text-secondary opacity-7 text-end pe-3"> </th>
+                            <th class="text-secondary opacity-7 text-end pe-3">Action </th>
                         </tr>
                     </thead>
 
@@ -93,13 +93,13 @@
 
                             {{-- actions --}}
                             <td class="text-end">
-                                <a href="" class="btn btn-sm btn-secondary">Edit</a>
+                                <a href="{{route('inspection.edit',$in->id)}}" class="btn btn-dark btn-sm mt-1">Edit</a>
 
-                                <form method="POST" action="" class="d-inline"
+                                {{-- <form method="POST" action="" class="d-inline"
                                     onsubmit="return confirm('Delete this inspection?')">
                                     @csrf @method('DELETE')
                                     <button class="btn btn-sm btn-danger">Del</button>
-                                </form>
+                                </form> --}}
                             </td>
                         </tr>
                         @empty
