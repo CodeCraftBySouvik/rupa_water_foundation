@@ -10,6 +10,7 @@ Route::prefix('auth')->group(function () {
         Route::put('/about-us/{id}',[AboutUsController::class, 'update']);
 
 	    Route::get('/location', [LocationController::class, 'location']);
+	    Route::get('/gallery', [GalleryController::class, 'gallery']);
         
     });
 });
