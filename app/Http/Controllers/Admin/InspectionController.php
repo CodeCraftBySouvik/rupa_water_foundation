@@ -133,9 +133,8 @@ class InspectionController extends Controller
     {
         $request->validate([
             'gallery_id' => 'required|exists:inspection_images,id',
-            'image' => 'required|image|mimes:jpg,jpeg,png,webp,gif,svg|max:5120', // same as galleryStore
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif,svg|max:5120',
         ], [
-            'image.required' => 'Please upload an image.',
             'image.image' => 'Uploaded file must be an image.',
             'image.mimes' => 'Image must be a type of: jpg, jpeg, png, webp, gif, or svg.',
             'image.max' => 'Image must not be larger than 5MB.',
@@ -145,26 +144,31 @@ class InspectionController extends Controller
 
         $gallery = InspectionImage::findOrFail($request->gallery_id);
 
-        // Delete old image if exists
-        if (!empty($gallery->image_path) && file_exists(public_path($gallery->image_path))) {
-            unlink(public_path($gallery->image_path));
-        }
-
+        // Check if image is uploaded
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            // Delete old image if exists
+            if (!empty($gallery->image_path) && file_exists(public_path($gallery->image_path))) {
+                unlink(public_path($gallery->image_path));
+            }
+
+            // Save new image
             $image = $request->file('image');
             $fileName = time() . rand(10000, 99999) . '.' . $image->extension();
             $filePath = 'uploads/inspection_galleries/' . $fileName;
-
             $image->move(public_path('uploads/inspection_galleries/'), $fileName);
 
+            // Update only if new image uploaded
             $gallery->update([
                 'image_path' => $filePath,
             ]);
         }
 
+        //  No update called if image is not uploaded = old image remains untouched
+
         return redirect()->route('inspection.galleries.list', ['inspection_id' => $gallery->inspection_id])
                         ->with('success', 'Image updated successfully.');
     }
+
 
 
 
