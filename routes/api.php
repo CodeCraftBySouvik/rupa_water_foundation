@@ -1,5 +1,5 @@
 <?php
-use App\Http\Controllers\Api\{AuthController,AboutUsController};
+use App\Http\Controllers\Api\{AuthController,AboutUsController,LocationController};
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -9,5 +9,7 @@ Route::prefix('auth')->group(function () {
         Route::get('/about-us',[AboutUsController::class, 'show']);
         Route::put('/about-us/{id}',[AboutUsController::class, 'update']);
 
+	    Route::get('/location', [LocationController::class, 'location']);
+        
     });
 });
