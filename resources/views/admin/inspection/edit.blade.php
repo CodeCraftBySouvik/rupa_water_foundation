@@ -143,7 +143,7 @@
                             <textarea name="notes" rows="3" class="form-control">{{ old('notes', $inspection->notes) }}</textarea>
                         </div>
 
-                        <button class="btn btn-danger btn-sm">Update Inspection</button>
+                        <button class="btn btn-primary btn-sm">Update Inspection</button>
                        
                     </div>
                 </form>
