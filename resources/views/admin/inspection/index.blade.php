@@ -33,7 +33,7 @@
                                 Cleanliness</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                 Checked By</th>
-                            <th class="text-secondary opacity-7 text-end pe-3">Action </th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Action </th>
                         </tr>
                     </thead>
 
@@ -100,6 +100,8 @@
                                     @csrf @method('DELETE')
                                     <button class="btn btn-sm btn-danger">Del</button>
                                 </form> --}}
+                                <a href="{{ route('inspection.galleries.list', ['inspection_id' => $in->id]) }}" class="btn btn-info btn-sm mt-1">
+                                 Gallery</a>                                
                             </td>
                         </tr>
                         @empty

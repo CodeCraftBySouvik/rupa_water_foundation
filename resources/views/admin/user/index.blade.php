@@ -29,7 +29,7 @@
                                     <th
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Email</th>
-                                    {{-- <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th> --}}
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -43,7 +43,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <p class="text-xs font-weight-bold mb-0">{{$data->name}}</p>
+                                        <p class="text-xs font-weight-bold mb-0">{{ucwords($data->name)}}</p>
                                     </td>
                                     <td class="align-middle text-center text-sm">
                                         <span class="badge badge-sm bg-gradient-success">{{$data->mobile}}</span>
@@ -51,11 +51,11 @@
                                     <td class="align-middle text-center">                                       
                                         <span class="text-secondary text-xs font-weight-bold">{{$data->email}}</span>
                                     </td>
-                                    {{-- <td class="align-middle">
-                                        <a href="#" class="btn btn-dark btn-sm mt-1">
+                                    <td class="align-middle">
+                                        <a href="{{route('user.edit',$data->id)}}"class="btn btn-dark btn-sm mt-1">
                                             Edit
                                         </a>
-                                    </td> --}}
+                                    </td>
                                 </tr>
                                 @empty
                                 <tr>
