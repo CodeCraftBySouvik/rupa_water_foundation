@@ -36,18 +36,21 @@
                                             class="position-absolute top-0 end-0 m-1">
                                             @csrf
 
-                                            <button type="submit" onclick="return confirm('Delete this image?')"
+                                            {{-- <button type="submit" onclick="return confirm('Delete this image?')"
                                                 class="btn btn-danger btn-sm d-flex align-items-center justify-content-center p-0"
                                                 style="width:24px;height:24px;line-height:0;">
+                                                X --}}
                                                 {{-- <i class="fa fa-times text-white small"></i> --}}
                                             {{-- </button> --}}
 
-                                            <button type="button" class="btn btn-danger btn-sm delete-image-button"
+                                            <button type="button" class="btn btn-danger btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center delete-image-button"
                                                 data-form-id="form-{{ $item->id }}-{{$index}}" style="width:24px;height:24px;line-height:0;">
                                                 X</button>
+
                                             </button>
                                         </form>
 
+                                    </div>
                                 </div>
                                 @endforeach
                             </div>
