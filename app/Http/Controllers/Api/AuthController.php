@@ -11,32 +11,73 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function register(Request $request){
-        $data = $request->validate([
-            'name'     => 'required|string',
-             'mobile'   => [
+    // public function register(Request $request){
+    //     $data = $request->validate([
+    //         'name'     => 'required|string',
+    //          'mobile'   => [
+    //             'required',
+    //             'regex:/^[6-9]\d{9}$/',  // ensures 10 digits starting with 6–9
+    //             'unique:users,mobile',
+    //         ],
+    //         'email'    => 'required|email|unique:users',
+    //         'password' => 'required|min:6',
+    //     ]);
+
+    //     $user = User::create([
+    //         'name'     => $data['name'],
+    //         'mobile'     => $data['mobile'],
+    //         'email'    => $data['email'],
+    //         'password' => Hash::make($data['password']),
+    //     ]);
+
+    //     $token = auth('api')->login($user);
+    //     return response()->json([
+    //         'message' => 'Register Successfully',
+    //         'token' => $token,
+    //         'user'  => $user
+    //     ]);
+
+    // }
+
+     public function store(Request $request)
+    {
+        /* ---------- 1. Validate input ---------- */
+        $validator = Validator::make($request->all(), [
+            'name'   => 'required|string|max:255',
+            'mobile' => [
                 'required',
-                'regex:/^[6-9]\d{9}$/',  // ensures 10 digits starting with 6–9
+                'regex:/^[6-9]\d{9}$/',     // Indian 10‑digit mobile
                 'unique:users,mobile',
             ],
             'email'    => 'required|email|unique:users',
             'password' => 'required|min:6',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        /* ---------- 2. Create user ---------- */
         $user = User::create([
-            'name'     => $data['name'],
-            'mobile'     => $data['mobile'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
+            'name'     => $request->name,
+            'mobile'   => $request->mobile,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
         ]);
 
+        /* ---------- 3. Optional: issue a JWT (comment out if you don’t want it) ---------- */
         $token = auth('api')->login($user);
-        return response()->json([
-            'message' => 'Register Successfully',
-            'token' => $token,
-            'user'  => $user
-        ]);
 
+        /* ---------- 4. Return JSON ---------- */
+        return response()->json([
+            'status'  => true,
+            'message' => 'User created successfully',
+            'user'    => $user,
+            'token' => $token   // include only if you kept step 3
+        ], 201);
     }
 
     // public function login(Request $request){

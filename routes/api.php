@@ -1,8 +1,9 @@
 <?php
-use App\Http\Controllers\Api\{AuthController,AboutUsController,LocationController,GalleryController};
+use App\Http\Controllers\Api\{AuthController,AboutUsController,LocationController,GalleryController,InspectionController};
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/user-store', [AuthController::class, 'store']);
     Route::post('/login', [AuthController::class, 'login']);
 
     Route::middleware('auth:api')->group(function(){
@@ -11,6 +12,6 @@ Route::prefix('auth')->group(function () {
 
 	    Route::get('/location', [LocationController::class, 'location']);
 	    Route::get('/gallery', [GalleryController::class, 'index']);
-        
+        Route::post('/inspections', [InspectionController::class, 'store']);
     });
 });
