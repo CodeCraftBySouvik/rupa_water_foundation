@@ -83,6 +83,9 @@
                                 <div class="form-group mt-2">
                                     <label for="image">Image <span class="text-danger">*</span></label>
                                     <input type="file" name="images[]" class="form-control" multiple>
+                                    @error('images') 
+                                        <p class="text-danger small">{{ $message }}</p> 
+                                    @enderror
                                     @error('images.*') <p class="text-danger small">{{ $message }}</p> @enderror
                                 </div>
                                 <input type="hidden" name="inspection_id" value="{{ $inspection->id }}">

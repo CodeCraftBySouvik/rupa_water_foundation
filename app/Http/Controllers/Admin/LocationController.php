@@ -10,7 +10,7 @@ use App\Models\Location;
 class LocationController extends Controller
 {
     public function location(){
-        $locationData = Location::latest()->get();
+        $locationData = Location::orderBy('location_id', 'asc')->get();
         return view('admin.location.index',compact('locationData'));
     }
 
