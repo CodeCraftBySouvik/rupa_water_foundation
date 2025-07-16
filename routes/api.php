@@ -1,5 +1,5 @@
 <?php
-use App\Http\Controllers\Api\{AuthController,AboutUsController,LocationController};
+use App\Http\Controllers\Api\{AuthController,AboutUsController,LocationController,GalleryController};
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -10,7 +10,7 @@ Route::prefix('auth')->group(function () {
         Route::put('/about-us/{id}',[AboutUsController::class, 'update']);
 
 	    Route::get('/location', [LocationController::class, 'location']);
-	    Route::get('/gallery', [GalleryController::class, 'gallery']);
+	    Route::get('/gallery', [GalleryController::class, 'index']);
         
     });
 });
