@@ -90,14 +90,8 @@ class InspectionController extends Controller
     {
         $request->validate([
             'inspection_id' => 'required|exists:inspections,id',
-            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp,gif,svg|max:5120', // Multiple images
-        ], [
-            'images.*.required' => 'Please upload at least one image.',
-            'images.*.image' => 'Each uploaded file must be an image.',
-            'images.*.mimes' => 'Each image must be a type of: jpg, jpeg, png, webp, gif, or svg.',
-            'images.*.max' => 'Each image must not be larger than 5MB.',
-            'inspection_id.required' => 'Inspection ID is required.',
-            'inspection_id.exists' => 'The selected inspection does not exist.',
+            'images' => 'required|array|min:1',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp,gif,svg|max:5120',// Multiple images
         ]);
 
         $inspectionId = $request->input('inspection_id');
