@@ -65,7 +65,7 @@
                                         {{-- <a href="{{route('location.edit',$data->id)}}" class="btn btn-dark btn-sm mt-1">
                                             Edit
                                         </a> --}}
-                                        <a href="{{ route('location.show', $data->id) }}"  class="btn btn-sm btn-icon btn-success">                  
+                                        <a href="{{ route('location.show', $data->id) }}"  class="btn btn-info btn-sm mt-1">                  
                                             Show
                                         </a>
                                     </td>
