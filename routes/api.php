@@ -9,11 +9,13 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:api')->group(function(){
         Route::get('/about-us',[AboutUsController::class, 'show']);
         Route::put('/about-us/{id}',[AboutUsController::class, 'update']);
-        
+
 	    Route::get('/location', [LocationController::class, 'location']);
         Route::get('/location_details/{id}', [LocationController::class, 'details']);
 	    Route::get('/gallery', [GalleryController::class, 'index']);
         Route::post('/inspections', [InspectionController::class, 'store']);
         Route::post('/inspections/{id}/gallery', [InspectionController::class, 'inspectionGalleryStore']);
+        Route::get('/inspections/{location_id}/{checked_by}/{checked_date}/status',
+           [InspectionController::class, 'inspectionStatus']);
     });
 });

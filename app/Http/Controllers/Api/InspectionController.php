@@ -74,6 +74,30 @@ class InspectionController extends Controller
         ]);
     }
 
+      public function inspectionStatus($location_id, $checked_by, $checked_date)
+    {
+        // cast into array so we can reuse the same validator rule set
+        $data = compact('location_id', 'checked_by', 'checked_date');
+
+        validator($data, [
+            'location_id'  => 'required|exists:locations,id',
+            'checked_by'   => 'required|exists:users,id',
+            'checked_date' => 'required|date',
+        ])->validate();
+
+        $exists = Inspection::where('location_id',  $location_id)
+            ->where('checked_by',   $checked_by)
+            ->whereDate('checked_date', $checked_date)
+            ->exists();
+
+        return response()->json([
+            'status'    => true,
+            'submitted' => $exists,
+            'message'   => $exists ? 'Already submitted' : 'Not submitted yet',
+        ]);
+    }
+
+
 
 
 
