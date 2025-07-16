@@ -62,8 +62,11 @@
                                             class="text-secondary text-xs font-weight-bold">{{$data->opening_date}}</span>
                                     </td>
                                     <td class="align-middle">
-                                        <a href="{{route('location.edit',$data->id)}}" class="btn btn-dark btn-sm mt-1">
+                                        {{-- <a href="{{route('location.edit',$data->id)}}" class="btn btn-dark btn-sm mt-1">
                                             Edit
+                                        </a> --}}
+                                        <a href="{{ route('location.show', $data->id) }}"  class="btn btn-sm btn-icon btn-success">                  
+                                            Show
                                         </a>
                                     </td>
                                 </tr>
@@ -76,6 +79,9 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+                    <div class="">
+                        {{ $locationData->links() }}
                     </div>
                 </div>
             </div>
