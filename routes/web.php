@@ -63,7 +63,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/location-store', [LocationController::class, 'location_store'])->name('location.store');
 	Route::get('/location-edit-form/{id}', [LocationController::class, 'location_edit_form'])->name('location.edit');
 	Route::post('/location-update', [LocationController::class, 'location_update'])->name('location.update');
-
+	
 	// Inspection
 	Route::prefix('inspection') ->name('inspection.')->group(function () {
 		Route::get('/', [InspectionController::class, 'index'])->name('index');
