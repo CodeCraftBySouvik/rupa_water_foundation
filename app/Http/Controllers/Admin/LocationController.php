@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Validation\Rule;
 use App\Models\Location;
 
 class LocationController extends Controller
 {
     public function location(){
-        $locationData = Location::orderBy('location_id', 'asc')->get();
+        $locationData = Location::orderBy('location_id', 'asc')->paginate(20);
         return view('admin.location.index',compact('locationData'));
     }
 
@@ -74,7 +75,10 @@ class LocationController extends Controller
 
     }
 
-    
+    public function show($id) {
+        $data = Location::findOrFail($id);
+        return view('admin.location.show',compact('data'));
+    }
     
 
 }
