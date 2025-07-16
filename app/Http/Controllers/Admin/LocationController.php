@@ -10,7 +10,7 @@ use App\Models\Location;
 class LocationController extends Controller
 {
     public function location(){
-        $locationData = Location::orderBy('location_id', 'asc')->get();
+        $locationData = Location::orderBy('location_id', 'asc')->paginate(10);
         return view('admin.location.index',compact('locationData'));
     }
 

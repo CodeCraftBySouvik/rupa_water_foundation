@@ -14,40 +14,27 @@
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     @foreach($galleryItems as $item)
-                    @php
-                    $images = explode(',', $item->image_path); // Convert comma string to array
-                    @endphp
-
+                    
                     <div class="card mb-3">
                         <div class="card-body">
                             <div class="row g-3"> {{-- Bootstrap gap utility --}}
-                                @foreach($images as $index => $img)
+                                @foreach ($item->images as $index => $img)
                                 <div class="col-md-3 col-sm-4 col-6">
-
-                                    {{-- each thumbnail gets a relative wrapper --}}
                                     <div class="position-relative rounded overflow-hidden shadow-sm">
 
                                         {{-- thumbnail --}}
-                                        <img src="{{ asset($img) }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Gallery image {{ $index+1 }}">
+                                        <img src="{{ asset($img) }}" class="img-fluid w-100 h-100 object-fit-cover"
+                                            alt="Gallery image {{ $index + 1 }}">
 
-                                        {{--  delete / close button --}}
+                                        {{-- delete X button --}}
                                         <form id="form-{{ $item->id }}-{{ $index }}" method="POST"
-                                            action="{{route('gallery.image.delete',[$item->id,$index])}}"
+                                            action="{{ route('gallery.image.delete', [$item->id, $index]) }}"
                                             class="position-absolute top-0 end-0 m-1">
                                             @csrf
-
-                                            {{-- <button type="submit" onclick="return confirm('Delete this image?')"
-                                                class="btn btn-danger btn-sm d-flex align-items-center justify-content-center p-0"
-                                                style="width:24px;height:24px;line-height:0;">
-                                                X --}}
-                                                {{-- <i class="fa fa-times text-white small"></i> --}}
-                                            {{-- </button> --}}
-
-                                            <button type="button" class="btn btn-danger btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center delete-image-button"
-                                                data-form-id="form-{{ $item->id }}-{{$index}}" style="width:24px;height:24px;line-height:0;">
-                                                X</button>
-
-                                            </button>
+                                            <button type="button"
+                                                class="btn btn-danger btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center delete-image-button"
+                                                data-form-id="form-{{ $item->id }}-{{ $index }}"
+                                                style="width:24px;height:24px;line-height:0;">X</button>
                                         </form>
 
                                     </div>

@@ -8,4 +8,10 @@ class Gallery extends Model
 {
     protected $table = "galleries";
     protected $fillable = ['image_path'];
+    public function getImagesAttribute(): array
+    {
+        return $this->image_path
+            ? explode(',', $this->image_path)
+            : [];
+    }
 }

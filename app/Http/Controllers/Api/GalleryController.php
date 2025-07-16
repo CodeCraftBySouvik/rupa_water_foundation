@@ -8,24 +8,31 @@ use App\Models\Gallery;
 
 class GalleryController extends Controller
 {
-     public function index()
+      public function index()
     {
-        $galleries = Gallery::all()->map(function ($item) {
-            $paths = explode(',', $item->image_path);
+        $gallery = Gallery::first(); // Always using the first (or only) row
 
-            return [
-                'id'     => $item->id,
-                'images' => collect($paths)->map(function ($path) {
-                    return url($path); // Full URL to image
-                })->values()
-            ];
-        });
+        if (!$gallery) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No gallery found',
+                'images' => [],
+            ]);
+        }
+
+        $images = collect(explode(',', $gallery->image_path))
+                    ->filter()
+                    ->map(function ($imgPath) {
+                        return asset($imgPath); // full URL to image
+                    })
+                    ->values();
 
         return response()->json([
             'status' => true,
-            'data'   => $galleries
+            'message' => 'Gallery images fetched successfully',
+            'images' => $images,
         ]);
     }
 
-    
+
 }
