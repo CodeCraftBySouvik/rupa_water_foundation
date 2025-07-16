@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Inspection;
+use App\Models\InspectionImage;
 
 class InspectionController extends Controller
 {
@@ -45,7 +48,34 @@ class InspectionController extends Controller
     }
 
 
-    
+     public function inspectionGalleryStore($id)
+    {
+        $inspection = Inspection::find($id);
+
+        if (!$inspection) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Inspection not found',
+            ], 404);
+        }
+
+        $images = InspectionImage::where('inspection_id', $id)
+                   ->get()
+                   ->map(function ($img) {
+                       return [
+                           'url' => asset($img->image_path), // full URL
+                       ];
+                   });
+
+        return response()->json([
+            'status'       => true,
+            'inspectionId' => $id,
+            'images'       => $images,
+        ]);
+    }
+
+
+
 
 
 }
