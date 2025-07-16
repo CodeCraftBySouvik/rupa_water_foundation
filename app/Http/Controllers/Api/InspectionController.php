@@ -48,31 +48,65 @@ class InspectionController extends Controller
     }
 
 
-     public function inspectionGalleryStore($id)
+    //  public function inspectionGalleryStore($id)
+    // {
+    //     $inspection = Inspection::find($id);
+
+    //     if (!$inspection) {
+    //         return response()->json([
+    //             'status'  => false,
+    //             'message' => 'Inspection not found',
+    //         ], 404);
+    //     }
+
+    //     $images = InspectionImage::where('inspection_id', $id)
+    //               ->get()
+    //               ->map(function ($img) {
+    //                   return [
+    //                       'url' => asset($img->image_path), // full URL
+    //                   ];
+    //               });
+
+    //     return response()->json([
+    //         'status'       => true,
+    //         'inspectionId' => $id,
+    //         'images'       => $images,
+    //     ]);
+    // }
+    
+   public function inspectionGalleryStore(Request $request)
     {
-        $inspection = Inspection::find($id);
-
-        if (!$inspection) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Inspection not found',
-            ], 404);
+        $request->validate([
+            'inspection_id' => 'required|exists:inspections,id',
+            'images'        => 'required|array|min:1',
+            'images.*'      => 'image|max:5120',
+        ]);
+    
+        $uploadedImages = [];
+    
+        foreach ($request->file('images') as $img) {
+            $name = time() . rand(1000, 9999) . '.' . $img->extension();
+            $img->move(public_path('uploads/inspection_galleries'), $name);
+    
+            $path = 'uploads/inspection_galleries/' . $name;
+    
+            // Save to DB
+            InspectionImage::create([
+                'inspection_id' => $request->inspection_id,
+                'image_path'    => $path,
+            ]);
+    
+            // Collect full URL
+            $uploadedImages[] = asset($path);
         }
-
-        $images = InspectionImage::where('inspection_id', $id)
-                   ->get()
-                   ->map(function ($img) {
-                       return [
-                           'url' => asset($img->image_path), // full URL
-                       ];
-                   });
-
+    
         return response()->json([
-            'status'       => true,
-            'inspectionId' => $id,
-            'images'       => $images,
+            'status'  => true,
+            'message' => 'Images uploaded',
+            'images'  => $uploadedImages,
         ]);
     }
+
 
       public function inspectionStatus($location_id, $checked_by, $checked_date)
     {

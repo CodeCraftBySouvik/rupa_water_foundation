@@ -14,7 +14,7 @@ Route::prefix('auth')->group(function () {
         Route::get('/location_details/{id}', [LocationController::class, 'details']);
 	    Route::get('/gallery', [GalleryController::class, 'index']);
         Route::post('/inspections', [InspectionController::class, 'store']);
-        Route::post('/inspections/{id}/gallery', [InspectionController::class, 'inspectionGalleryStore']);
+        Route::post('/inspections/gallery', [InspectionController::class, 'inspectionGalleryStore']);
         Route::get('/inspections/{location_id}/{checked_by}/{checked_date}/status',
            [InspectionController::class, 'inspectionStatus']);
     });

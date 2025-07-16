@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Location;
+use App\Models\Inspection;
+use App\Models\User;
+use App\Models\InspectionImage;
 use Illuminate\Http\Response;
 
 class LocationController extends Controller
@@ -19,19 +22,47 @@ class LocationController extends Controller
     }
 
     public function details($id){
-        $locations = Location::select('location_id', 'title', 'position', 'opening_date')->find($id);
+        $location = Location::select('location_id', 'title', 'position', 'opening_date')->find($id);
 
-        if(!$locations){
+        if(!$location){
             return response()->json([
                 'message' => 'Location not found',
                 'success' => false,
                 'data'    => null
             ], Response::HTTP_OK);
         }
+
+         // Fetch latest inspection for this location
+         $inspection = Inspection::where('location_id', $id)
+                    ->latest('checked_date')
+                    ->first();
+
+        // If inspection exists, get checked_by name and image URLs
+            if ($inspection) {
+            $checkedByUser = User::find($inspection->checked_by);
+            $images = InspectionImage::where('inspection_id', $inspection->id)
+                        ->get()
+                        ->map(function ($img) {
+                            return asset($img->image_path);  // Return full URL
+                        });
+        } else {
+            $checkedByUser = null;
+            $images = [];
+        }
+
+
         return response()->json([
             'message' => 'Location Details Fetched Successfully',
             'success' => true,
-            'data'    => $locations
+            'data'    => [
+                        'location_id'   => $location->location_id,
+                        'title'         => $location->title,
+                        'position'      => $location->position,
+                        'opening_date'  => $location->opening_date,
+                        'last_checked_by' => $checkedByUser ? $checkedByUser->name : null,
+                        'last_checked_date' => $inspection ? $inspection->checked_date : null,
+                        'images'        => $images,
+                    ]
         ], Response::HTTP_OK);
     }
 
