@@ -11,6 +11,7 @@ Route::prefix('auth')->group(function () {
         Route::put('/about-us/{id}',[AboutUsController::class, 'update']);
 
 	    Route::get('/location', [LocationController::class, 'location']);
+        Route::get('/location_details/{id}', [LocationController::class, 'details']);
 	    Route::get('/gallery', [GalleryController::class, 'index']);
         Route::post('/inspections', [InspectionController::class, 'store']);
     });
