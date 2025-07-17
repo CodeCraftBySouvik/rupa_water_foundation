@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Log;
 use App\Models\Inspection;
 use App\Models\{Location, User, InspectionImage};
@@ -33,8 +34,8 @@ class InspectionController extends Controller
     }
 
     public function index(){
-        $inspections = Inspection::all();
-        return view('admin.inspection.index',compact('inspections'));
+        $inspections = Inspection::paginate(2); // Show 10 records per page
+        return view('admin.inspection.index', compact('inspections'));
     }
 
     public function create(){

@@ -110,14 +110,15 @@
                         </tr>
                         @endforelse
                     </tbody>
-                </table>
-
+                </table>               
             </div>
+             {{-- Laravel pagination links --}}           
+            <div>
+                {{ $inspections->links() }}
+            </div>
+            
         </div>
     </div>
-
-    {{-- Laravel pagination links (if you used paginate()) --}}
-    {{-- {{ $inspections->links() }} --}}
 
 </div>
 @endsection
