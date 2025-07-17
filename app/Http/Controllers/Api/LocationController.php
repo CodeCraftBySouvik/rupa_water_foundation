@@ -16,7 +16,7 @@ class LocationController extends Controller
         $location = Location::all();
         return response()->json([
             'message' => 'Location Fetched Successfully',
-            'success' => true,
+            'status' => true,
             'data'    => $location
         ],Response::HTTP_OK);
     }
@@ -27,7 +27,7 @@ class LocationController extends Controller
         if(!$location){
             return response()->json([
                 'message' => 'Location not found',
-                'success' => false,
+                'status' => false,
                 'data'    => null
             ], Response::HTTP_OK);
         }
@@ -53,7 +53,7 @@ class LocationController extends Controller
 
         return response()->json([
             'message' => 'Location Details Fetched Successfully',
-            'success' => true,
+            'status' => true,
             'data'    => [
                         'location_id'   => $location->location_id,
                         'title'         => $location->title,
