@@ -33,7 +33,7 @@ class InspectionController extends Controller
     }
 
     public function index(){
-        $inspections = Inspection::all();
+        $inspections = Inspection::latest()->get();
         return view('admin.inspection.index',compact('inspections'));
     }
 
