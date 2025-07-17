@@ -62,6 +62,19 @@ class LocationController extends Controller
                         'last_checked_by' => $checkedByUser ? $checkedByUser->name : null,
                         'last_checked_date' => $inspection ? $inspection->checked_date : null,
                         'images'        => $images,
+                        'report'             => $inspection ? [
+                            'water_quality'          => $inspection->water_quality,
+                            'electric_available'     => $inspection->electric_available,
+                            'cooling_system'         => $inspection->cooling_system,
+                            'cleanliness'            => $inspection->cleanliness,
+                            'tap_glass_condition'    => $inspection->tap_glass_condition,
+                            'electric_meter_working' => $inspection->electric_meter_working,
+                            'compressor_condition'   => $inspection->compressor_condition,
+                            'light_availability'     => $inspection->light_availability,
+                            'filter_condition'       => $inspection->filter_condition,
+                            'electric_usage_method'  => $inspection->electric_usage_method,
+                            'notes'                  => $inspection->notes,
+                        ] : null,
                     ]
         ], Response::HTTP_OK);
     }
