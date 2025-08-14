@@ -15,7 +15,7 @@ use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ChangePassword;            
 use App\Http\Controllers\Admin\{AboutUsController,GalleryController,LocationController,InspectionController,UserController};            
             
-
+Route::middleware('site.down')->group(function () {
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
 	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
 	Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
@@ -80,4 +80,5 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/galleries/update', [InspectionController::class, 'galleryUpdate'])->name('galleries.update');
 	});
 	
+});
 });

@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
               // 🔑 JWT‑Auth specific (optional but handy)
             'jwt.auth'    => JwtAuthenticate::class,
             'jwt.refresh' => JwtRefresh::class,
+
+            'site.down'   => \App\Http\Middleware\SiteDownMiddleware::class,
          ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
