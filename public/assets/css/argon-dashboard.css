@@ -7321,6 +7321,7 @@ textarea.form-control-lg {
 
 .position-absolute {
   position: absolute !important;
+  z-index: -1;
 }
 
 .position-fixed {

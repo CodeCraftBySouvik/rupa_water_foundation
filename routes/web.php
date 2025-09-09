@@ -13,7 +13,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ChangePassword;            
-use App\Http\Controllers\Admin\{AboutUsController,GalleryController,LocationController,InspectionController,UserController};            
+use App\Http\Controllers\Admin\{AboutUsController,GalleryController,LocationController,InspectionController,UserController,ZoneController};            
             
 Route::middleware('site.down')->group(function () {
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
@@ -78,6 +78,21 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/galleries/store', [InspectionController::class, 'galleryStore'])->name('galleries.Store');
 		Route::get('/galleries/edit/{id}', [InspectionController::class, 'galleryEdit'])->name('galleries.edit');
 		Route::post('/galleries/update', [InspectionController::class, 'galleryUpdate'])->name('galleries.update');
+	});
+
+	// Zone management
+	Route::prefix('zone') ->name('zone.')->group(function () {
+		Route::get('/', [ZoneController::class, 'index'])->name('index');
+		Route::get('/create', [ZoneController::class, 'create'])->name('create');
+		Route::post('/store', [ZoneController::class, 'store'])->name('store');
+		Route::get('/edit-form/{id}', [ZoneController::class, 'edit'])->name('edit');
+		Route::post('/update', [ZoneController::class, 'update'])->name('update');
+		Route::post('/toggle-status/{id}', [ZoneController::class, 'toggleStatus'])->name('toggleStatus');
+
+		// zone wise location
+		Route::get('/location', [ZoneController::class, 'zoneWiseLocationIndex'])->name('location.index');
+		
+
 	});
 	
 });
