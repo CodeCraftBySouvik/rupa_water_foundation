@@ -88,16 +88,18 @@
                             <small>Employees</small>
                         </div>
                         <div>
-                            <h4 class="text-primary">45</h4>
+                            <h4 class="text-primary">{{$zone->zone_locations_count}}</h4>
                             <small>Locations</small>
                         </div>
                     </div>
 
                     <div class="mt-3 d-flex justify-content-between">
-                        <a href="#" class="btn btn-outline-secondary btn-sm">
+                        <a href="javascript:void(0);" class="btn btn-outline-secondary btn-sm"
+                            onclick="viewLocations({{ $zone->id }})">
                             <i class="fas fa-map-marker-alt"></i> View Locations
                         </a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm">
+                        <a href="javascript:void(0);" class="btn btn-outline-secondary btn-sm"
+                            onclick="viewEmployees({{ $zone->id }})">
                             <i class="fas fa-users"></i> View Employees
                         </a>
                     </div>
@@ -113,6 +115,9 @@
         </div>
         @endforelse
 
+        <div class="d-flex justify-content-center mt-4">
+            {{ $zones->links() }}
+        </div>
         <!-- Edit Zone Modal -->
         <div class="modal fade" id="editZoneModal" tabindex="-1" role="dialog" aria-labelledby="editZoneModalLabel"
             aria-hidden="true">
@@ -149,9 +154,29 @@
                 </form>
             </div>
         </div>
-
-
     </div>
+
+    {{-- View Locations Modal --}}
+    <div class="modal fade" id="viewLocationsModal" tabindex="-1" aria-labelledby="viewLocationsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Zone Locations</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="locationsList" class="list-group">
+                        <!-- Location items will be appended dynamically here -->
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     {{-- <div class="row">
         <div class="col-md-4">
@@ -188,6 +213,41 @@
 @endsection
 
 @section('scripts')
+<script>
+    function viewLocations(zoneId) {
+    let url = "{{ route('zone.getLocations', ':id') }}".replace(':id', zoneId);
+
+    $.ajax({
+        url: url,
+        method: 'GET',
+        success: function(response) {
+            $('#locationsList').empty();
+
+            if (response.locations.length > 0) {
+                response.locations.forEach(function(location) {
+                    $('#locationsList').append(`
+                        <li class="list-group-item">
+                            <strong>${location.location_name}</strong> - 
+                            <span class="badge ${location.status === 'Active' ? 'bg-success' : 'bg-danger'}">${location.status}</span>
+                        </li>
+                    `);
+                });
+            } else {
+                $('#locationsList').append(`<li class="list-group-item">No locations found.</li>`);
+            }
+
+            $('#viewLocationsModal').modal('show');
+        },
+        error: function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Unable to fetch locations'
+            });
+        }
+    });
+}
+
+</script>
 <script>
     $(document).ready(function () {
     $('#editZoneForm').on('submit', function(e){
@@ -230,11 +290,13 @@
                             </p>
                             <div class="d-flex justify-content-between mt-3">
                                 <div><h4 class="text-primary">312</h4><small>Employees</small></div>
-                                <div><h4 class="text-primary">45</h4><small>Locations</small></div>
+                                <div><h4 class="text-primary">${response.location_count}</h4><small>Locations</small></div>
                             </div>
 
                             <div class="mt-3 d-flex justify-content-between">
-                                <a href="#" class="btn btn-outline-secondary btn-sm"><i class="fas fa-map-marker-alt"></i> View Locations</a>
+                                <a href="javascript:void(0);" class="btn btn-outline-secondary btn-sm" onclick="viewLocations(${response.zone.id})">
+                                    <i class="fas fa-map-marker-alt"></i> View Locations
+                                </a>
                                 <a href="#" class="btn btn-outline-secondary btn-sm"><i class="fas fa-users"></i> View Employees</a>
                             </div>
                         </div>
@@ -242,6 +304,12 @@
                 `;
 
                 $('#zone-card-' + response.zone.id).html(updatedZoneHtml);
+                $('#zone-location-count-' + response.zone.id).text(response.location_count);
+
+               
+
+                // // Open the modal
+                // $('#viewLocationsModal').modal('show');
             },
             error: function(xhr) {
                 let errors = xhr.responseJSON.errors;

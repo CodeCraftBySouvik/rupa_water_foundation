@@ -16,7 +16,7 @@
                     <div class="table-responsive p-0">
                         <table class="table align-items-center mb-0">
                             <thead>
-                                <tr>
+                                <tr class="text-center">
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Sl.No</th>
                                     <th
@@ -34,39 +34,47 @@
                                         Action</th>
                                 </tr>
                             </thead>
-                            {{-- <tbody>
-                                @forelse($userlist as $key=> $data)
-                                <tr>
+                            <tbody id="locationsTableBody">
+                                @forelse($locations as $index=> $data)
+                                <tr class="text-center"  id="location-row-{{ $data->id }}">
                                     <td>
-                                        <div class="d-flex px-2 py-1">
-                                            <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">{{$key + 1}}</h6>
-                                            </div>
+                                        <div class="">
+                                            <h6 class="mb-0 text-sm">{{$index + 1}}</h6>
                                         </div>
                                     </td>
                                     <td>
-                                        <p class="text-xs font-weight-bold mb-0">{{ucwords($data->name)}}</p>
+                                        <p class="text-xs font-weight-bold mb-0">{{ucwords($data->zone_name ?
+                                            $data->zone_name->name : '')}}</p>
                                     </td>
                                     <td class="align-middle text-center text-sm">
-                                        <span class="badge badge-sm bg-gradient-success">{{$data->mobile}}</span>
+                                        <span class="badge badge-sm bg-gradient-success">{{$data->location_name}}</span>
                                     </td>
-                                    <td class="align-middle text-center">
-                                        <span class="text-secondary text-xs font-weight-bold">{{$data->email}}</span>
+                                    <td class="text-center">
+                                        <div class="form-check form-switch d-flex justify-content-center">
+                                            <input type="checkbox" class="form-check-input"
+                                                id="statusSwitch{{ $data->id }}" {{ $data->status === 'Active' ?
+                                            'checked' : '' }}
+                                            onchange="toggleLocationStatus({{ $data->id }},this.checked)">
+                                        </div>
                                     </td>
+
                                     <td class="align-middle">
-                                        <a href="{{route('user.edit',$data->id)}}" class="btn btn-dark btn-sm mt-1">
-                                            Edit
+                                        <a href="{{route('zone.location.index',['edit' => $data->id])}}" class=" " style="margin-right: 8px;">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <a href="javascript:void(0);" onclick="deleteLocation({{$data->id}})">
+                                            <i class="fa fa-trash text-danger"></i>
                                         </a>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
                                     <td colspan="5" class="text-center py-4">
-                                        No User data found.
+                                        No Zone Location Found
                                     </td>
                                 </tr>
                                 @endforelse
-                            </tbody> --}}
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -75,19 +83,22 @@
         {{-- --}}
 
         <div class="col-md-4">
-            <form method="POST" action="">
+            <form method="POST" action="{{ isset($editLocation) ? route('zone.location.update', $editLocation->id) : route('zone.location.store') }}">
                 @csrf
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-uppercase text-sm">About Us</p>
+                        <p class="text-uppercase text-sm">{{isset($editLocation) ? 'Edit' : 'Create'}} Zone Wise Location</p>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="example-text-input" class="form-control-label">Zone</label>
                                     <select name="zone_id" id="zone_id" class="form-control">
-                                        <option value="">-- Select Zone --</option>
+                                        <option value="" selected hidden>-- Select Zone --</option>
                                         @foreach ($getZones as $zone)
-                                         <option value="{{ $zone->id }}">{{ $zone->name }}</option>
+                                        <option value="{{ $zone->id }}"
+                                            {{(isset($editLocation) && $editLocation->zone_id == $zone->id) ? 'selected' : ''}}>
+                                            {{ $zone->name }}
+                                        </option>
                                         @endforeach
                                     </select>
                                     @error('zone_id')
@@ -98,7 +109,8 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="example-text-input" class="form-control-label">Location</label>
-                                    <input type="text" class="form-control" name="location_name" value="{{ old('location_name') }}">
+                                    <input type="text" class="form-control" name="location_name"
+                                        value="{{ old('location_name',$editLocation->location_name ?? '') }}">
                                     @error('location_name')
                                     <p class="text-danger small">{{$message}}</p>
                                     @enderror
@@ -106,7 +118,7 @@
                             </div>
 
                             <div class="col-md-2">
-                                <button type="submit" class="btn btn-primary btn-sm">Edit</button>
+                                <button type="submit" class="btn btn-primary btn-sm">{{isset($editLocation) ? 'Update' : 'Create'}}</button>
                             </div>
                         </div>
                     </div>
@@ -117,4 +129,85 @@
     </div>
     {{-- @include('layouts.footers.auth.footer') --}}
 </div>
+@endsection
+@section('scripts')
+<script>
+    function toggleLocationStatus(locationId,isChecked){
+         let status = isChecked ? 'Active' : 'Inactive';
+          let url = "{{ route('zone.location.status', ':id') }}".replace(':id', locationId);
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                status: status
+            },
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Status updated!',
+                    showConfirmButton: false,
+                    timer: 1200
+                });
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'An error occurred.',
+                });
+                $('#statusSwitch' + locationId).prop('checked', !isChecked);
+            }
+        });
+    }
+
+
+    // Delete Location
+    function deleteLocation(locationId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let url = "{{ route('zone.location.delete', ':id') }}".replace(':id', locationId);
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Location deleted!',
+                            showConfirmButton: false,
+                            timer: 1200
+                        });
+                         $('#location-row-' + locationId).remove();
+                         // Check if there are any remaining location rows
+                        if ($('#locationsTableBody tr').length === 0) {
+                            $('#locationsTableBody').append(`
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        No Zone Location Found
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'An error occurred.',
+                        });
+                    }
+                });
+            }
+        });
+    }
+</script>
 @endsection

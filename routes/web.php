@@ -88,10 +88,17 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/edit-form/{id}', [ZoneController::class, 'edit'])->name('edit');
 		Route::post('/update', [ZoneController::class, 'update'])->name('update');
 		Route::post('/toggle-status/{id}', [ZoneController::class, 'toggleStatus'])->name('toggleStatus');
+		Route::get('/locations/{id}', [ZoneController::class, 'getLocations'])->name('getLocations');
 
 		// zone wise location
 		Route::get('/location', [ZoneController::class, 'zoneWiseLocationIndex'])->name('location.index');
+		Route::post('/location/create', [ZoneController::class, 'zoneWiseLocationStore'])->name('location.store');
+		Route::post('/location/update/{id}', [ZoneController::class, 'zoneWiseLocationUpdate'])->name('location.update');
+		Route::post('/location/toggle-status/{id}', [ZoneController::class, 'zoneWiseLocationStatus'])->name('location.status');
+		Route::post('/location/delete/{id}', [ZoneController::class, 'zoneWiseLocationDelete'])->name('location.delete');
 		
+		// zone wise employee
+		Route::get('/employee', [ZoneController::class, 'zoneWiseEmployeeIndex'])->name('employee.index');
 
 	});
 	

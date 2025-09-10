@@ -12,4 +12,10 @@ class ZoneWiseLocation extends Model
         'location_name',
         'status'
     ];
+
+    public function zone_name(){
+        return $this->belongsTo(Zone::class,'zone_id','id');
+    }
+
+
 }

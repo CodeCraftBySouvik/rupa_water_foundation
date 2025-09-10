@@ -23,7 +23,9 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'mobile',
         'password',
-        
+        'role', 
+        'status', 
+        'supervisor_id'
     ];
 
     /**
@@ -64,5 +66,24 @@ class User extends Authenticatable implements JWTSubject
      public function getJWTCustomClaims()
     {
         return [];
+    }
+
+
+     public function zones() {
+        return $this->belongsToMany(
+            Zone::class,
+            'employee_zone_assignments',
+            'employee_id',
+            'zone_id'
+        )->withPivot('status', 'assigned_date', 'transferred_date');
+    }
+
+    public function locations() {
+        return $this->belongsToMany(
+            Location::class,
+            'employee_location_assignments',
+            'employee_id',
+            'location_id'
+        )->withPivot('zone_id', 'status', 'assigned_date', 'transferred_date');
     }
 }
