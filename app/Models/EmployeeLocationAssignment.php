@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EmployeeZoneAssignments extends Model
+class EmployeeLocationAssignment extends Model
 {
-    protected $table = "employee_zone_assignments";
+    protected $table = "employee_location_assignments";
     protected $fillable = [
-        'employee_id',  
+        'employee_id',
         'zone_id',
+        'location_id',
         'status',
         'assigned_date',
         'transferred_date'

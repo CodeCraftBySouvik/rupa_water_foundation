@@ -92,6 +92,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 		// zone wise location
 		Route::get('/location', [ZoneController::class, 'zoneWiseLocationIndex'])->name('location.index');
+		Route::get('/location/sample-csv', [ZoneController::class, 'downloadSampleCsv'])->name('location.sample');
+		Route::post('/location/import', [ZoneController::class, 'import'])->name('location.import');
 		Route::post('/location/create', [ZoneController::class, 'zoneWiseLocationStore'])->name('location.store');
 		Route::post('/location/update/{id}', [ZoneController::class, 'zoneWiseLocationUpdate'])->name('location.update');
 		Route::post('/location/toggle-status/{id}', [ZoneController::class, 'zoneWiseLocationStatus'])->name('location.status');
@@ -99,6 +101,9 @@ Route::group(['middleware' => 'auth'], function () {
 		
 		// zone wise employee
 		Route::get('/employee', [ZoneController::class, 'zoneWiseEmployeeIndex'])->name('employee.index');
+		Route::post('/employee/store', [ZoneController::class, 'zoneWiseEmployeeStore'])->name('employee.store');
+		Route::post('/employee/toggle-status/{id}', [ZoneController::class, 'zoneWiseEmployeeStatus'])->name('employee.status');
+	
 
 	});
 	

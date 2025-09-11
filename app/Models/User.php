@@ -68,6 +68,11 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
+    public function supervisor()
+    {
+        return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
 
      public function zones() {
         return $this->belongsToMany(
@@ -80,7 +85,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function locations() {
         return $this->belongsToMany(
-            Location::class,
+            ZoneWiseLocation::class,
             'employee_location_assignments',
             'employee_id',
             'location_id'

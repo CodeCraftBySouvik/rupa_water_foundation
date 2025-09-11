@@ -9,9 +9,53 @@
                 <div id="alert">
                     @include('components.alert')
                 </div>
-                <div class="card-header pb-0">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6>Zone Wise Location</h6>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#importModal">
+                            <i class="fas fa-file-csv me-1"></i> Import
+                        </button>
+                    </div>
                 </div>
+                {{-- Import Modal --}}
+                <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="importModalLabel">Import CSV File</h5>
+                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-dismiss="modal">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                <form method="POST" action="{{ route('zone.location.import') }}">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="file" class="form-label">Upload CSV File</label>
+                                        <input type="file" name="file" class="form-control">
+                                        @error('file') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="fas fa-file-csv me-1"></i> Import
+                                        </button>
+
+                                        <button type="button" onclick="window.location='{{ route('zone.location.sample') }}'"
+                                            class="btn btn-outline-success btn-sm">
+                                            <i class="fas fa-file-csv me-1"></i> Sample CSV Download
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
                         <table class="table align-items-center mb-0">
@@ -36,7 +80,7 @@
                             </thead>
                             <tbody id="locationsTableBody">
                                 @forelse($locations as $index=> $data)
-                                <tr class="text-center"  id="location-row-{{ $data->id }}">
+                                <tr class="text-center" id="location-row-{{ $data->id }}">
                                     <td>
                                         <div class="">
                                             <h6 class="mb-0 text-sm">{{$index + 1}}</h6>
@@ -47,7 +91,8 @@
                                             $data->zone_name->name : '')}}</p>
                                     </td>
                                     <td class="align-middle text-center text-sm">
-                                        <span class="badge badge-sm bg-gradient-success">{{$data->location_name}}</span>
+                                        <span class="badge badge-sm bg-gradient-success">{{$data->location_details ?
+                                            $data->location_details->title : '-'}}</span>
                                     </td>
                                     <td class="text-center">
                                         <div class="form-check form-switch d-flex justify-content-center">
@@ -59,7 +104,8 @@
                                     </td>
 
                                     <td class="align-middle">
-                                        <a href="{{route('zone.location.index',['edit' => $data->id])}}" class=" " style="margin-right: 8px;">
+                                        <a href="{{route('zone.location.index',['edit' => $data->id])}}" class=" "
+                                            style="margin-right: 8px;">
                                             <i class="fa fa-edit"></i>
                                         </a>
                                         <a href="javascript:void(0);" onclick="deleteLocation({{$data->id}})">
@@ -83,11 +129,13 @@
         {{-- --}}
 
         <div class="col-md-4">
-            <form method="POST" action="{{ isset($editLocation) ? route('zone.location.update', $editLocation->id) : route('zone.location.store') }}">
+            <form method="POST"
+                action="{{ isset($editLocation) ? route('zone.location.update', $editLocation->id) : route('zone.location.store') }}">
                 @csrf
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-uppercase text-sm">{{isset($editLocation) ? 'Edit' : 'Create'}} Zone Wise Location</p>
+                        <p class="text-uppercase text-sm">{{isset($editLocation) ? 'Edit' : 'Create'}} Zone Wise
+                            Location</p>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -95,8 +143,8 @@
                                     <select name="zone_id" id="zone_id" class="form-control">
                                         <option value="" selected hidden>-- Select Zone --</option>
                                         @foreach ($getZones as $zone)
-                                        <option value="{{ $zone->id }}"
-                                            {{(isset($editLocation) && $editLocation->zone_id == $zone->id) ? 'selected' : ''}}>
+                                        <option value="{{ $zone->id }}" {{(isset($editLocation) && $editLocation->
+                                            zone_id == $zone->id) ? 'selected' : ''}}>
                                             {{ $zone->name }}
                                         </option>
                                         @endforeach
@@ -106,19 +154,31 @@
                                     @enderror
                                 </div>
                             </div>
+                            {{-- Locations --}}
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="example-text-input" class="form-control-label">Location</label>
-                                    <input type="text" class="form-control" name="location_name"
-                                        value="{{ old('location_name',$editLocation->location_name ?? '') }}">
-                                    @error('location_name')
-                                    <p class="text-danger small">{{$message}}</p>
+                                    <label for="location_id" class="form-control-label">Location</label>
+                                    <select class="form-control select2-single" name="location_id" id="location_id">
+                                        <option value="" selected hidden>Select Location</option>
+                                        @foreach($getLocations as $location)
+                                        <option value="{{ $location->id }}" {{ old('location_id', $editLocation->
+                                            location_id ?? '') == $location->id ? 'selected' : '' }}>
+                                            {{ $location->title }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+
+                                    @error('location_id')
+                                    <p class="text-danger small">{{ $message }}</p>
                                     @enderror
                                 </div>
                             </div>
 
+
+
                             <div class="col-md-2">
-                                <button type="submit" class="btn btn-primary btn-sm">{{isset($editLocation) ? 'Update' : 'Create'}}</button>
+                                <button type="submit" class="btn btn-primary btn-sm">{{isset($editLocation) ? 'Update' :
+                                    'Create'}}</button>
                             </div>
                         </div>
                     </div>
@@ -132,6 +192,14 @@
 @endsection
 @section('scripts')
 <script>
+    $(document).ready(function() {
+        $('#location_id').select2({
+            placeholder: "Select Location",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+
     function toggleLocationStatus(locationId,isChecked){
          let status = isChecked ? 'Active' : 'Inactive';
           let url = "{{ route('zone.location.status', ':id') }}".replace(':id', locationId);
