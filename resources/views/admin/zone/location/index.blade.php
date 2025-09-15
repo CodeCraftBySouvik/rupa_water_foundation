@@ -31,7 +31,7 @@
                             </div>
 
                             <div class="modal-body">
-                                <form method="POST" action="{{ route('zone.location.import') }}">
+                                <form method="POST" action="{{ route('zone.location.import') }}" enctype="multipart/form-data">
                                     @csrf
                                     <div class="mb-3">
                                         <label for="file" class="form-label">Upload CSV File</label>

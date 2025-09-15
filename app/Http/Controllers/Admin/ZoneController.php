@@ -100,7 +100,7 @@ class ZoneController extends Controller
 
     // Zone wise location
     public function downloadSampleCsv(){
-         $columns = ['Zone_name', 'Location_name', 'Opening_date', 'Size'];
+         $columns = ['Zone', 'Location', 'Opening Date', 'Size'];
 
         $callback = function () use ($columns) {
             $file = fopen('php://output', 'w');
@@ -127,64 +127,79 @@ class ZoneController extends Controller
         ]);
     }
 
-    public function import(Request $request){
+    public function import(Request $request)
+    {
         $request->validate([
             'file' => 'required|mimetypes:text/plain,text/csv,application/csv,text/comma-separated-values,application/vnd.ms-excel',
         ]);
-        
+
         try {
-                $path = $this->file->getRealPath();
-                $file = fopen($path, 'r');
+            $file = $request->file('file');
 
-                $header = fgetcsv($file); // Skip header row
+            if (!$file || !$file->isValid()) {
+                throw new \Exception('Invalid file upload.');
+            }
 
-                while ($row = fgetcsv($file)) {
-                    // Basic row validation
-                    if (count($row) < 5) {
-                        throw new \Exception('Invalid row format.');
-                    }
+            $path = $file->getRealPath();
+            $fileHandle = fopen($path, 'r');
 
-                    $zoneName      = trim($row[0]); 
-                    $locationId    = trim($row[1]); 
-                    $title         = trim($row[2]); 
-                    $position      = trim($row[3]); 
-                    $openingDate   = trim($row[4]); 
+            $header = fgetcsv($fileHandle); // Skip header row
 
-                    // Get Zone by name (or throw error if not found)
-                    $zone = \App\Models\Zone::where('name', $zoneName)->first();
-                    if (!$zone) {
-                        throw new \Exception("Zone '{$zoneName}' not found.");
-                    }
-
-                    // Validate opening_date format
-                    $parsedDate = \DateTime::createFromFormat('d.m.y', $openingDate);
-                    if (!$parsedDate) {
-                        throw new \Exception("Invalid date format at row: {$zoneName}, {$openingDate}");
-                    }
-
-                    // Create ZoneWiseLocation entry
-                    \App\Models\ZoneWiseLocation::create([
-                        'zone_id'       => $zone->id,
-                        'location_id'   => $locationId,
-                        'title'         => $title,
-                        'position'      => (int) $position,
-                        'opening_date'  => $parsedDate->format('Y-m-d'),
-                        'status'        => 'active',
-                    ]);
+            while ($row = fgetcsv($fileHandle)) {
+                if (count($row) < 4) {
+                    throw new \Exception('Invalid row format.');
                 }
 
-                fclose($file);
+                $zoneName      = trim($row[0]); 
+                $locationTitle = trim($row[1]); 
+                $openingDate   = trim($row[2]); 
+                $size         = trim($row[3]); 
 
-                session()->flash('success', 'CSV imported successfully.');
+                // Find the Zone by name
+                $zone = Zone::where('name', $zoneName)->first();
+                if (!$zone) {
+                    throw new \Exception("Zone '{$zoneName}' not found.");
+                }
 
-            } catch (\Exception $e) {
-                dd($request->getMessage());
-                session()->flash('import_errors', [
-                    ['row' => $row ?? [], 'errors' => [$e->getMessage()]]
+                // Find Location by title
+                $location = Location::where('title', $locationTitle)->first();
+                if (!$location) {
+                    throw new \Exception("Location '{$locationTitle}' not found.");
+                }
+
+                // Check if this zone-location combination already exists
+                $exists = ZoneWiseLocation::where('zone_id', $zone->id)
+                            ->where('location_id', $location->id)
+                            ->exists();
+
+                if ($exists) {
+                    // Skip this row if already exists
+                    continue;
+                }
+
+                $parsedDate = \DateTime::createFromFormat('d.m.y', $openingDate);
+                if (!$parsedDate) {
+                    throw new \Exception("Invalid date format at row: {$zoneName}, {$openingDate}");
+                }
+
+                ZoneWiseLocation::create([
+                    'zone_id'       => $zone->id,
+                    'location_id'   => $location->id,   // Match location by title
+                    'size'          => $size,
+                    'opening_date'  => $parsedDate->format('Y-m-d'),
+                    'status'        => 'active',
                 ]);
             }
 
+            fclose($fileHandle);
+            return redirect()->back()->with('success', 'CSV imported successfully.');
+
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
     }
+
+
 
     public function zoneWiseLocationIndex(Request $request){
         $getZones = Zone::latest()->get();
@@ -199,12 +214,18 @@ class ZoneController extends Controller
     }
 
     public function zoneWiseLocationStore(Request $request){
-         $request->validate([
+        $validated = $request->validate([
             'zone_id'       => 'required|exists:zones,id',
             'location_id' => 'required|string|max:255'
          ]);
-
-         ZoneWiseLocation::create($request->all());
+           // Check if this zone-location combination already exists
+                $exists = ZoneWiseLocation::where('zone_id', $validated['zone_id'])
+                            ->where('location_id', $validated['location_id'])
+                            ->exists();
+        if ($exists) {
+            return redirect()->back()->with('error', 'This Zone and Location combination already exists.');
+        }
+         ZoneWiseLocation::create($validated);
          return redirect()->back()->with('success', 'Zone Location created successfully.');
     }
 
