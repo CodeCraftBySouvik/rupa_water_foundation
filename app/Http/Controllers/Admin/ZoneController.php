@@ -90,7 +90,7 @@ class ZoneController extends Controller
             'locations' => $zone->zoneLocations->map(function ($loc) {
                 return [
                     'id'            => $loc->id,      
-                    'location_name' => $loc->location_name,
+                    'location_name' => $loc->location_details->title ?? null,
                     'status'        => $loc->status,
                 ];
             }),
@@ -185,7 +185,7 @@ class ZoneController extends Controller
                 ZoneWiseLocation::create([
                     'zone_id'       => $zone->id,
                     'location_id'   => $location->id,   // Match location by title
-                    'size'          => $size,
+                    'position'          => $size,
                     'opening_date'  => $parsedDate->format('Y-m-d'),
                     'status'        => 'active',
                 ]);
@@ -230,10 +230,22 @@ class ZoneController extends Controller
     }
 
     public function zoneWiseLocationUpdate(Request $request,$id){
-        $request->validate([
+       $validated = $request->validate([
             'zone_id'       => 'required|exists:zones,id',
             'location_id' => 'required|string|max:255',
        ]);
+
+        // Check if this zone-location combination already exists
+        $exists = ZoneWiseLocation::where('zone_id', $validated['zone_id'])
+                    ->where('location_id', $validated['location_id'])
+                    ->where('id', '!=', $id)
+                    ->exists();
+
+        if($exists){
+            return redirect()->back()
+                    ->with('error','This Zone and Location combination already exists.')
+                    ->withInput(['zone_id' => '', 'location_id' => '']);
+        }
 
        $location = ZoneWiseLocation::findOrFail($id);
        $location->update($request->all());
@@ -263,6 +275,7 @@ class ZoneController extends Controller
               'message' => 'Zone location deleted successfully.'
         ]);
     }
+    
 
 
     // Zone Wise Employee
@@ -281,7 +294,7 @@ class ZoneController extends Controller
         $userlist = User::with([
             'supervisor:id,name,email',
             'zones:id,name',        // multiple zones if assigned
-            'locations:id,location_name' // multiple locations if assigned
+            'locations.location_details'
         ])
         ->select('id', 'name', 'mobile', 'email', 'password', 'role', 'status', 'supervisor_id')
         ->where('name', '!=', 'Super Admin') 
@@ -292,6 +305,7 @@ class ZoneController extends Controller
     }
 
     public function zoneWiseEmployeeStore(Request $request){
+        // dd($request->all());
        $validated = $request->validate([
                         'name'         => 'required|string|max:255',
                         'email'        => 'required|email|unique:users,email',
@@ -348,6 +362,25 @@ class ZoneController extends Controller
                 'message' => 'Something went wrong: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function zoneWiseEmployeeEdit($id)
+    {
+        $employee = User::with(['zones', 'locations'])->findOrFail($id);
+
+        $zoneId     = $employee->zones->first()->id ?? null;
+        $locationId = $employee->locations->first()->id ?? null;
+
+        return response()->json([
+            'id'            => $employee->id,
+            'name'          => $employee->name,
+            'email'         => $employee->email,
+            'mobile'        => $employee->mobile,
+            'role'          => $employee->role,
+            'supervisor_id' => $employee->supervisor_id,
+            'zone_id'       => $zoneId,
+            'location_id'   => $locationId,
+        ]);
     }
 
     public function zoneWiseEmployeeStatus(Request $request, $id)

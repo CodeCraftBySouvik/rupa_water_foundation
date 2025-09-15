@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models; 
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,4 +15,13 @@ class EmployeeLocationAssignment extends Model
         'assigned_date',
         'transferred_date'
     ];
+
+    public function locationDetails()
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
+
+    public function zone(){
+         return $this->belongsTo(Location::class, 'zone_id');
+    }
 }

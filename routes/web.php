@@ -102,6 +102,7 @@ Route::group(['middleware' => 'auth'], function () {
 		// zone wise employee
 		Route::get('/employee', [ZoneController::class, 'zoneWiseEmployeeIndex'])->name('employee.index');
 		Route::post('/employee/store', [ZoneController::class, 'zoneWiseEmployeeStore'])->name('employee.store');
+		Route::get('/employee/edit/{id}', [ZoneController::class, 'zoneWiseEmployeeEdit'])->name('employee.edit');
 		Route::post('/employee/toggle-status/{id}', [ZoneController::class, 'zoneWiseEmployeeStatus'])->name('employee.status');
 	
 

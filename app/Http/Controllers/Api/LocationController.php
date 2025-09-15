@@ -8,6 +8,8 @@ use App\Models\Location;
 use App\Models\Inspection;
 use App\Models\User;
 use App\Models\InspectionImage;
+use App\Models\EmployeeLocationAssignment;
+use App\Models\ZoneWiseLocation;
 use Illuminate\Http\Response;
 
 class LocationController extends Controller
@@ -133,6 +135,45 @@ class LocationController extends Controller
         ]
     ], Response::HTTP_OK);
 }
+
+  public function getUserAssignedZonesLocations(){
+     $userId = auth()->id();
+
+        // Get assigned zone-wise location assignments
+     $assignedLocationAssignments  = EmployeeLocationAssignment::where('employee_id', $userId)
+        ->where('status', 'active')
+        ->pluck('location_id')
+        ->unique()
+        ->toArray();
+
+     // Fetch zone-wise locations with related data
+    $zoneWiseLocations  = ZoneWiseLocation::with('location_details', 'zone_name')
+        ->whereIn('id', $assignedLocationAssignments)
+        ->where('status', 'active')
+        ->get();
+
+         // Prepare response
+    $locations = $zoneWiseLocations->map(function ($zoneLoc) {
+        return [
+            'zone_wise_location_id' => $zoneLoc->id,
+            'zone_id'               => $zoneLoc->zone_id,
+            'zone_name'             => $zoneLoc->zone_name->name ?? null,
+            'location_id'           => $zoneLoc->location_id,
+            'location_title'        => $zoneLoc->location_details->title ?? null,
+        ];
+    });
+
+    return response()->json([
+        'message' => "Zone Wise Location Fetched Successfully",
+        'status'  => true,
+        'data'    => [
+            'locations' => $locations
+        ]
+    ]);
+
+
+    
+  }
 
 
 

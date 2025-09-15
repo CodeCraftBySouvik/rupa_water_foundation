@@ -17,5 +17,8 @@ Route::prefix('auth')->group(function () {
         Route::post('/inspections/gallery', [InspectionController::class, 'inspectionGalleryStore']);
         Route::get('/inspections/{location_id}/{checked_by}/{checked_date}/status',
            [InspectionController::class, 'inspectionStatus']);
+
+	    Route::get('/zone-wise-location', [LocationController::class, 'getUserAssignedZonesLocations']);
+        
     });
 });

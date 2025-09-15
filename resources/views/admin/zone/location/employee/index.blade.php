@@ -54,7 +54,6 @@
                             <td>
                                 <p class="text-xs font-weight-bold mb-0">{{ucwords($data->role)}}</p>
                             </td>
-                            {{-- @dd($data->zones) --}}
                             <td>
                                 <p class="text-xs font-weight-bold mb-0">
                                     {{ucwords($data->zones->pluck('name')->implode(', '))}}</p>
@@ -62,8 +61,10 @@
 
                             <td>
                                 <p class="text-xs font-weight-bold mb-0">
-                                    {{ucwords($data->locations->pluck('location_name')->implode(', '))}}</p>
+                                    {{ ucwords(optional($data->locations->first()->location_details)->title ?? 'N/A') }}
+                                </p>
                             </td>
+
 
                             <td>
                                 <p class="text-xs font-weight-bold mb-0">{{ucwords($data->supervisor ?
@@ -87,37 +88,14 @@
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="actionsDropdown{{ $data->id }}">
                                         <li><a class="dropdown-item" href="#"
-                                                onclick="showActionCard({{ $data->id }})">Edit</a></li>
+                                                onclick="transferEmployee({{ $data->id }})">Transfer</a></li>
                                         <li><a class="dropdown-item" href="#"
-                                                onclick="showActionCard({{ $data->id }})">Transfer</a></li>
+                                                onclick="editEmployee({{ $data->id }})">Edit</a></li>
                                         <li><a class="dropdown-item text-danger" href="#"
-                                                onclick="showActionCard({{ $data->id }})">Delete</a></li>
+                                                onclick="deleteEmployee({{ $data->id }})">Delete</a></li>
                                     </ul>
                                 </div>
-
-                                <!-- Action Card (Initially Hidden) -->
-                                <div id="actionCard{{ $data->id }}" class="position-absolute"
-                                    style="display: none; z-index: 1050;">
-                                    <div class="card shadow-sm" style="width: 18rem;">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Employee Actions</h5>
-                                            <button class="btn btn-primary btn-sm"
-                                                onclick="editEmployee({{ $data->id }})">Edit</button>
-                                            <button class="btn btn-warning btn-sm"
-                                                onclick="transferEmployee({{ $data->id }})">Transfer</button>
-                                            <button class="btn btn-danger btn-sm"
-                                                onclick="deleteEmployee({{ $data->id }})">Delete</button>
-                                        </div>
-                                    </div>
-                                </div>
                             </td>
-
-
-                            {{-- <td class="align-middle">
-                                <a href="{{route('user.edit',$data->id)}}" class="btn btn-dark btn-sm mt-3">
-                                    Edit
-                                </a>
-                            </td> --}}
                         </tr>
                         @empty
                         <tr>
@@ -128,7 +106,8 @@
                         @endforelse
                     </tbody>
                 </table>
-            {{-- </div> --}}
+                {{--
+            </div> --}}
         </div>
     </div>
 
@@ -244,11 +223,130 @@
         </div>
     </div>
 
+    {{-- Edit Employee Modal --}}
+    <div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <form id="editEmployeeForm">
+                @csrf
+                <input type="hidden" name="employee_id" id="edit_employee_id">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Employee</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" name="name" id="edit_employee_name">
+                                <div class="text-danger small" id="edit_employee_name_error"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" name="email" id="edit_employee_email">
+                                <div class="text-danger small" id="edit_employee_email_error"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Phone *</label>
+                                <input type="phone" class="form-control" name="phone" id="edit_employee_phone">
+                                <div class="text-danger small" id="edit_employee_phone_error"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select" name="role" id="edit_employee_role">
+                                    <option value="">Select role</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="employee">Employee</option>
+                                    <option value="complaint">Complaint</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select" name="supervisor_id" id="edit_employee_supervisor">
+                                    <option value="" selected hidden>Select Supervisor</option>
+                                    @foreach($supervisors as $supervisor)
+                                    <option value="{{ $supervisor->id }}">{{ $supervisor->name }} ({{ $supervisor->email }})
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select" name="zone_id" id="edit_employee_zone">
+                                    <option value="" selected hidden>Select Zone</option>
+                                    @foreach($zones as $zone)
+                                    <option value="{{ $zone->id }}">{{ $zone->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <select class="form-select" name="location_id" id="edit_employee_location">
+                                    <option value="" selected hidden>Select location</option>
+                                    {{-- Populated dynamically based on selected zone --}}
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Update Employee</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
 </div>
 @endsection
 @section('scripts')
 <script>
+    // Edit Employee
+    function editEmployee(employeeId) {
+    let url = "{{ route('zone.employee.edit', ':id') }}".replace(':id', employeeId);
+
+    $.ajax({
+        url: url,
+        type: 'GET',
+        success: function(data) {
+            $('#edit_employee_id').val(data.id);
+            $('#edit_employee_name').val(data.name);
+            $('#edit_employee_email').val(data.email);
+            $('#edit_employee_phone').val(data.mobile);
+            $('#edit_employee_role').val(data.role);
+            $('#edit_employee_supervisor').val(data.supervisor_id);
+
+            // Set Zone
+            $('#edit_employee_zone').val(data.zone_id).trigger('change');
+
+            // After zone change triggers, fetch locations and set location_id
+            let getLocationsUrl = "{{ route('zone.getLocations', ['id' => 'ZONE_ID_PLACEHOLDER']) }}";
+            let locationsUrl = getLocationsUrl.replace('ZONE_ID_PLACEHOLDER', data.zone_id);
+
+            $.ajax({
+                url: locationsUrl,
+                type: 'GET',
+                success: function(locData) {
+                    $('#edit_employee_location').empty().append('<option value="" selected hidden>Select location</option>');
+                    $.each(locData.locations, function(key, location) {
+                        let selected = location.id == data.location_id ? 'selected' : '';
+                        $('#edit_employee_location').append(
+                            '<option value="' + location.id + '" ' + selected + '>' + location.location_name + '</option>'
+                        );
+                    });
+
+                    $('#editEmployeeModal').modal('show');
+                }
+            });
+        },
+        error: function() {
+            Swal.fire('Error', 'Unable to fetch employee data.', 'error');
+        }
+    });
+}
+
     // Handle form submission
         $('#addEmployeeForm').submit(function(e) {
         e.preventDefault();
@@ -260,6 +358,7 @@
             type: 'POST',
             data: formData,
             success: function(response) {
+                console.log(response);
                 if (response.success) {
                     // Close modal
                     $('#addEmployeeModal').modal('hide'); 
