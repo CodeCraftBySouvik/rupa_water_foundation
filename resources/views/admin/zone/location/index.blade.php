@@ -31,7 +31,8 @@
                             </div>
 
                             <div class="modal-body">
-                                <form method="POST" action="{{ route('zone.location.import') }}" enctype="multipart/form-data">
+                                <form method="POST" action="{{ route('zone.location.import') }}"
+                                    enctype="multipart/form-data">
                                     @csrf
                                     <div class="mb-3">
                                         <label for="file" class="form-label">Upload CSV File</label>
@@ -44,7 +45,8 @@
                                             <i class="fas fa-file-csv me-1"></i> Import
                                         </button>
 
-                                        <button type="button" onclick="window.location='{{ route('zone.location.sample') }}'"
+                                        <button type="button"
+                                            onclick="window.location='{{ route('zone.location.sample') }}'"
                                             class="btn btn-outline-success btn-sm">
                                             <i class="fas fa-file-csv me-1"></i> Sample CSV Download
                                         </button>
@@ -56,7 +58,7 @@
                 </div>
 
 
-                <div class="card-body px-0 pt-0 pb-2">
+                {{-- <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
                         <table class="table align-items-center mb-0">
                             <thead>
@@ -122,8 +124,77 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        <div class="mt-3">
+                            {{ $locations->links() }}
+                        </div>
+                    </div>
+                </div> --}}
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        @forelse($locations->groupBy(function($data) {
+                        return $data->zone_name ? $data->zone_name->name : 'Unknown Zone';
+                        }) as $zoneName => $zoneLocations)
+                        <h5 class="text-primary mt-4 ms-4">{{ $zoneName }}</h5>
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr class="text-center">
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Sl.No</th>
+                                    <th
+                                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Location</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Status</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($zoneLocations as $index => $data)
+                                <tr class="text-center" id="location-row-{{ $data->id }}">
+                                    <td>
+                                        <div class="">
+                                            <h6 class="mb-0 text-sm">{{ $index + 1 }}</h6>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="badge badge-sm bg-gradient-success">
+                                            {{ $data->location_details ? $data->location_details->title : '-' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check form-switch d-flex justify-content-center">
+                                            <input type="checkbox" class="form-check-input"
+                                                id="statusSwitch{{ $data->id }}" {{ $data->status === 'Active' ?
+                                            'checked' : '' }}
+                                            onchange="toggleLocationStatus({{ $data->id }},this.checked)">
+                                        </div>
+                                    </td>
+                                    <td class="align-middle">
+                                        <a href="{{ route('zone.location.index', ['edit' => $data->id]) }}" class=" "
+                                            style="margin-right: 8px;">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <a href="javascript:void(0);" onclick="deleteLocation({{ $data->id }})">
+                                            <i class="fa fa-trash text-danger"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        @empty
+                        <div class="text-center py-4">No Zone Location Found</div>
+                        @endforelse
+
+                        <div class="mt-3">
+                            {{ $locations->links() }}
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
         {{-- --}}
@@ -173,7 +244,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            
+
 
 
                             <div class="col-md-2">

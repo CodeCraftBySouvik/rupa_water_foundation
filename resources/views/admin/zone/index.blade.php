@@ -386,6 +386,7 @@
                 method: "POST",
                 data: $(this).serialize(),
                 success: function (response) {
+                    console.log(response);
                      Swal.fire({
                         icon: 'success',
                         title: 'Zone added successfully!',
@@ -419,7 +420,7 @@
                                         </p>
                                         <div class="d-flex justify-content-between mt-3">
                                             <div><h4 class="text-primary">312</h4><small>Employees</small></div>
-                                            <div><h4 class="text-primary">45</h4><small>Locations</small></div>
+                                            <div><h4 class="text-primary">${response.location_count}</h4><small>Locations</small></div>
                                         </div>
 
                                         <div class="mt-3 d-flex justify-content-between">

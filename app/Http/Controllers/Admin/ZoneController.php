@@ -204,7 +204,7 @@ class ZoneController extends Controller
     public function zoneWiseLocationIndex(Request $request){
         $getZones = Zone::latest()->get();
         $getLocations = Location::all();
-         $locations = ZoneWiseLocation::with('location_details')->latest()->get();
+         $locations = ZoneWiseLocation::with('location_details')->latest()->paginate(20);
          
          $editLocation = null;
          if($request->has('edit')){
@@ -312,9 +312,9 @@ class ZoneController extends Controller
                         'password'     => 'required|min:6',
                         'phone'        => 'required|digits:10',
                         'role'         => 'required|in:ho,supervisor,employee,complaint',
-                        'supervisor_id'=> 'nullable|exists:users,id',
-                        'zone_id'      => 'required|exists:zones,id',
-                        'location_id'  => 'required|exists:zone_wise_locations,id',
+                        'supervisor_id'=> 'required|exists:users,id',
+                        'zone_id'       => 'required|array',
+                        'zone_id.*'     => 'exists:zones,id',
                     ]);
 
          \DB::beginTransaction();
@@ -330,22 +330,15 @@ class ZoneController extends Controller
                 'status'       => 'active',
             ]);
 
+           foreach ($validated['zone_id'] as $zoneId){
             // Assign Zone
             EmployeeZoneAssignment::create([
                 'employee_id'   => $employee->id,
-                'zone_id'       => $validated['zone_id'],
+                'zone_id'       => $zoneId,
                 'status'       => 'active',
                 'assigned_date'=> now()->toDateString(),
             ]);
-
-            // Assign Location
-            EmployeeLocationAssignment::create([
-                'employee_id'   => $employee->id,
-                'zone_id'       => $validated['zone_id'],
-                'location_id'   => $validated['location_id'],
-                'status'       => 'active',
-                'assigned_date'=> now()->toDateString(),
-            ]);
+        }
 
             \DB::commit();
 
@@ -354,6 +347,7 @@ class ZoneController extends Controller
                 'message'  => 'Employee created successfully.',
                 'employee' => $employee, // you can customize this payload
             ]);
+
         } catch (\Exception $e) {
             dd($e->getMessage());
             \DB::rollBack();

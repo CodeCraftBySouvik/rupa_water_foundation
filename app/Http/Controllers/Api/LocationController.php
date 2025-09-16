@@ -8,7 +8,7 @@ use App\Models\Location;
 use App\Models\Inspection;
 use App\Models\User;
 use App\Models\InspectionImage;
-use App\Models\EmployeeLocationAssignment;
+use App\Models\EmployeeZoneAssignment;
 use App\Models\ZoneWiseLocation;
 use Illuminate\Http\Response;
 
@@ -139,43 +139,36 @@ class LocationController extends Controller
   public function getUserAssignedZonesLocations(){
      $userId = auth()->id();
 
-        // Get assigned zone-wise location assignments
-     $assignedLocationAssignments  = EmployeeLocationAssignment::where('employee_id', $userId)
-        ->where('status', 'active')
-        ->pluck('location_id')
-        ->unique()
+   // Step 1: Get all assigned zone IDs from employee_zone_assignments
+    $zoneIds = EmployeeZoneAssignment::where('employee_id',$userId)
+        ->where('status','active')
+        ->pluck('zone_id')
         ->toArray();
 
-     // Fetch zone-wise locations with related data
-    $zoneWiseLocations  = ZoneWiseLocation::with('location_details', 'zone_name')
-        ->whereIn('id', $assignedLocationAssignments)
-        ->where('status', 'active')
+    // Step 2: Get locations based on those zone IDs from zone_wise_locations
+    $locations = ZoneWiseLocation::with('zone_name','location_details')
+        ->whereIn('zone_id',$zoneIds)
+        ->where('status','active')
         ->get();
+    
+      
+     // Step 3: Format the result
+     $result = $locations->map(function($item){
+         return [
+            'id'              => $item->id,
+            'zone_id'         => $item->zone_id,
+            'zone_name'       => $item->zone_name->name ?? 'N/A',
+            'location_id'     => $item->location_id,
+            'location_title'  => $item->location_details->title ?? 'N/A',
+         ];
+     });
 
-         // Prepare response
-    $locations = $zoneWiseLocations->map(function ($zoneLoc) {
-        return [
-            'zone_wise_location_id' => $zoneLoc->id,
-            'zone_id'               => $zoneLoc->zone_id,
-            'zone_name'             => $zoneLoc->zone_name->name ?? null,
-            'location_id'           => $zoneLoc->location_id,
-            'location_title'        => $zoneLoc->location_details->title ?? null,
-        ];
-    });
-
-    return response()->json([
-        'message' => "Zone Wise Location Fetched Successfully",
-        'status'  => true,
-        'data'    => [
-            'locations' => $locations
-        ]
-    ]);
-
-
+      return response()->json([
+        'message'   => 'Location Fetched Successfully',
+        'success'   => true,
+        'locations' => $result,
+      ]);
     
   }
-
-
-
 
 }

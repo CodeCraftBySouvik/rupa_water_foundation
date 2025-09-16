@@ -29,9 +29,7 @@
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Zone
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                Location
-                            </th>
+
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                 Supervisor
                             </th>
@@ -42,6 +40,7 @@
                         </tr>
                     </thead>
                     <tbody id="employeeList">
+                    
                         {{-- Dynamic employee rows will be prepended here --}}
                         @forelse($userlist as $key=> $data)
                         <tr class="text-center">
@@ -56,14 +55,10 @@
                             </td>
                             <td>
                                 <p class="text-xs font-weight-bold mb-0">
-                                    {{ucwords($data->zones->pluck('name')->implode(', '))}}</p>
-                            </td>
-
-                            <td>
-                                <p class="text-xs font-weight-bold mb-0">
-                                    {{ ucwords(optional($data->locations->first()->location_details)->title ?? 'N/A') }}
+                                    {{ucwords($data->zones->pluck('name')->implode(', '))}}
                                 </p>
                             </td>
+
 
 
                             <td>
@@ -191,7 +186,7 @@
                             <!-- Zone -->
                             <div class="col-md-6">
                                 <label for="employee_zone" class="form-label">Zone *</label>
-                                <select class="form-select" name="zone_id" id="employee_zone">
+                                <select class="form-select" name="zone_id[]" id="employee_zone" multiple style="width: 100%;">
                                     <option value="" selected hidden>Select zone</option>
                                     @foreach($zones as $zone)
                                     <option value="{{ $zone->id }}">{{ $zone->name }}</option>
@@ -199,18 +194,6 @@
                                 </select>
                                 <div class="text-danger small" id="employee_zone_error"></div>
                             </div>
-
-                            <!-- Location -->
-                            <div class="col-md-6">
-                                <label for="employee_location" class="form-label">Location</label>
-                                <select class="form-select" name="location_id" id="employee_location">
-                                    <option value="" selected hidden>Select location</option>
-                                    {{-- Here Location will get by select the zone --}}
-                                </select>
-                                <div class="text-danger small" id="employee_location_error"></div>
-                            </div>
-
-
                         </div>
                     </div>
 
@@ -266,24 +249,18 @@
                                 <select class="form-select" name="supervisor_id" id="edit_employee_supervisor">
                                     <option value="" selected hidden>Select Supervisor</option>
                                     @foreach($supervisors as $supervisor)
-                                    <option value="{{ $supervisor->id }}">{{ $supervisor->name }} ({{ $supervisor->email }})
+                                    <option value="{{ $supervisor->id }}">{{ $supervisor->name }} ({{ $supervisor->email
+                                        }})
                                     </option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <select class="form-select" name="zone_id" id="edit_employee_zone">
+                                <select class="form-select" name="zone_id" id="edit_employee_zone" style="width: 100px;">
                                     <option value="" selected hidden>Select Zone</option>
                                     @foreach($zones as $zone)
                                     <option value="{{ $zone->id }}">{{ $zone->name }}</option>
                                     @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <select class="form-select" name="location_id" id="edit_employee_location">
-                                    <option value="" selected hidden>Select location</option>
-                                    {{-- Populated dynamically based on selected zone --}}
                                 </select>
                             </div>
 
@@ -303,50 +280,10 @@
 @endsection
 @section('scripts')
 <script>
-    // Edit Employee
-    function editEmployee(employeeId) {
-    let url = "{{ route('zone.employee.edit', ':id') }}".replace(':id', employeeId);
-
-    $.ajax({
-        url: url,
-        type: 'GET',
-        success: function(data) {
-            $('#edit_employee_id').val(data.id);
-            $('#edit_employee_name').val(data.name);
-            $('#edit_employee_email').val(data.email);
-            $('#edit_employee_phone').val(data.mobile);
-            $('#edit_employee_role').val(data.role);
-            $('#edit_employee_supervisor').val(data.supervisor_id);
-
-            // Set Zone
-            $('#edit_employee_zone').val(data.zone_id).trigger('change');
-
-            // After zone change triggers, fetch locations and set location_id
-            let getLocationsUrl = "{{ route('zone.getLocations', ['id' => 'ZONE_ID_PLACEHOLDER']) }}";
-            let locationsUrl = getLocationsUrl.replace('ZONE_ID_PLACEHOLDER', data.zone_id);
-
-            $.ajax({
-                url: locationsUrl,
-                type: 'GET',
-                success: function(locData) {
-                    $('#edit_employee_location').empty().append('<option value="" selected hidden>Select location</option>');
-                    $.each(locData.locations, function(key, location) {
-                        let selected = location.id == data.location_id ? 'selected' : '';
-                        $('#edit_employee_location').append(
-                            '<option value="' + location.id + '" ' + selected + '>' + location.location_name + '</option>'
-                        );
-                    });
-
-                    $('#editEmployeeModal').modal('show');
-                }
-            });
-        },
-        error: function() {
-            Swal.fire('Error', 'Unable to fetch employee data.', 'error');
-        }
+    $('#employee_zone').select2({
+        allowClear: true,
+        dropdownParent: $('#addEmployeeModal')
     });
-}
-
     // Handle form submission
         $('#addEmployeeForm').submit(function(e) {
         e.preventDefault();
@@ -376,18 +313,37 @@
                     });
 
                     // Update employee list dynamically (assuming you have a div or table with id #employeeList)
-                    let newEmployeeHtml = `
-                        <tr id="employee_${response.data.id}">
-                            <td>${response.data.name}</td>
-                            <td>${response.data.email}</td>
-                            <td>${response.data.phone ?? '-'}</td>
-                            <td>${response.data.role}</td>
-                            <td>${response.data.supervisor_name ?? '-'}</td>
-                            <td>${response.data.zone_name ?? '-'}</td>
-                            <td>${response.data.location_name ?? '-'}</td>
-                        </tr>
-                    `;
-                    $('#employeeList').prepend(newEmployeeHtml); // add to top of the list
+                    // Build new employee row HTML
+                let newEmployeeHtml = `
+                    <tr class="text-center" id="employee_${response.data.id}">
+                        <td><h6 class="mb-0 text-sm">New</h6></td>
+                        <td><p class="text-xs font-weight-bold mb-0">${response.data.name}</p></td>
+                        <td><p class="text-xs font-weight-bold mb-0">${response.data.role}</p></td>
+                        <td><p class="text-xs font-weight-bold mb-0">${response.data.zone_name ?? '-'}</p></td>
+                        <td><p class="text-xs font-weight-bold mb-0">${response.data.supervisor_name ?? '-'}</p></td>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-flex justify-content-center">
+                                <input type="checkbox" class="form-check-input" id="statusSwitch${response.data.id}" ${response.data.status === 'active' ? 'checked' : ''} onchange="toggleEmployeeStatus(${response.data.id}, this.checked)">
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="dropdown dropup">
+                                <button class="btn btn-sm btn-outline-secondary" type="button" id="actionsDropdown${response.data.id}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="actionsDropdown${response.data.id}">
+                                    <li><a class="dropdown-item" href="#" onclick="transferEmployee(${response.data.id})">Transfer</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="editEmployee(${response.data.id})">Edit</a></li>
+                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteEmployee(${response.data.id})">Delete</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+
+                // Prepend new employee row
+                $('#employeeList').append(newEmployeeHtml);
+                
                 }
             },
             error: function(xhr) {
@@ -399,9 +355,8 @@
 
                         if (key === 'zone_id') {
                             errorFieldId = '#employee_zone_error';
-                        } else if (key === 'location_id') {
-                            errorFieldId = '#employee_location_error';
-                        } else if (key === 'supervisor_id') {
+                        }
+                        else if (key === 'supervisor_id') {
                             errorFieldId = '#employee_supervisor_error';
                         } else {
                             errorFieldId = '#employee_' + key + '_error';
@@ -418,33 +373,6 @@
                 }
             }
         });
-    });
-
-    // Fetch locations based on selected zone
-    let getLocationsUrl = "{{ route('zone.getLocations', ['id' => 'ZONE_ID_PLACEHOLDER']) }}";
-
-    $('#employee_zone').change(function() {
-        var zoneId = $(this).val();
-        if (zoneId) {
-            let url = getLocationsUrl.replace('ZONE_ID_PLACEHOLDER', zoneId);
-
-            $.ajax({
-                url: url,
-                type: 'GET',
-                success: function(data) {
-                    console.log(data);
-                    $('#employee_location').empty().append('<option value="" selected hidden>Select location</option>');
-                    $.each(data.locations, function(key, location) {
-                        $('#employee_location').append('<option value="' + location.id + '">' + location.location_name + '</option>');
-                    });
-                },
-                error: function() {
-                    alert('Error fetching locations. Please try again.');
-                }
-            });
-        } else {
-            $('#employee_location').empty().append('<option value="" selected hidden>Select location</option>');
-        }
     });
 
 

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\ZoneWiseLOcation;
+use App\Models\ZoneWiseLocation;
 
 class Zone extends Model
 {
@@ -15,6 +15,6 @@ class Zone extends Model
     ];
 
     public function zoneLocations(){
-        return $this->hasMany(ZoneWiseLOcation::class,'zone_id');
+        return $this->hasMany(ZoneWiseLocation::class,'zone_id');
     }
 }
