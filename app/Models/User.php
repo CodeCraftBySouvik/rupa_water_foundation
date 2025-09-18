@@ -91,4 +91,10 @@ class User extends Authenticatable implements JWTSubject
             'location_id'
         )->withPivot('zone_id', 'status', 'assigned_date', 'transferred_date');
     }
+
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class, 'user_id', 'id');
+    }
+
 }

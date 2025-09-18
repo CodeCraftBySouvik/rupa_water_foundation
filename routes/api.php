@@ -1,5 +1,5 @@
 <?php
-use App\Http\Controllers\Api\{AuthController,AboutUsController,LocationController,GalleryController,InspectionController};
+use App\Http\Controllers\Api\{AuthController,AboutUsController,LocationController,GalleryController,InspectionController,ComplaintDataStore};
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -17,8 +17,8 @@ Route::prefix('auth')->group(function () {
         Route::post('/inspections/gallery', [InspectionController::class, 'inspectionGalleryStore']);
         Route::get('/inspections/{location_id}/{checked_by}/{checked_date}/status',
            [InspectionController::class, 'inspectionStatus']);
-
+            
 	    Route::get('/zone-wise-location', [LocationController::class, 'getUserAssignedZonesLocations']);
-        
+        Route::post('/complaint-data-store', [ComplaintDataStore::class, 'complaintInfoStore']);
     });
 });

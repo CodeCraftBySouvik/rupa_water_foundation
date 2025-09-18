@@ -17,4 +17,8 @@ class Zone extends Model
     public function zoneLocations(){
         return $this->hasMany(ZoneWiseLocation::class,'zone_id');
     }
+
+    public function zoneEmployees(){
+        return $this->hasMany(EmployeeZoneAssignment::class,'zone_id');
+    }
 }

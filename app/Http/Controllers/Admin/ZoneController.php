@@ -12,13 +12,14 @@ use App\Models\EmployeeZoneAssignment;
 use App\Models\EmployeeLocationAssignment;
 use App\Models\Location;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class ZoneController extends Controller
 {
     
     
     public function index(){
-        $zones = Zone::withCount('zoneLocations')->with('zoneLocations')->latest()->paginate(10);
+        $zones = Zone::withCount(['zoneLocations','zoneEmployees'])->with(['zoneLocations','zoneEmployees'])->latest()->paginate(10);
         return view('admin.zone.index',compact('zones'));
     }
 
@@ -47,9 +48,9 @@ class ZoneController extends Controller
     }
 
     public function edit($id) {
-        $zone = Zone::findOrFail($id);
-        return response()->json($zone);
-   }
+            $zone = Zone::findOrFail($id);
+            return response()->json($zone);
+    }
 
     public function update(Request $request)
     {
@@ -65,18 +66,26 @@ class ZoneController extends Controller
         $zone->description = $request->description;
         $zone->save();
 
-        $zone->load('zoneLocations'); // Eager-load locations
+         $zone->load(['zoneLocations.location_details', 'zoneEmployees.employee']);  // Eager-load locations
         $locationCount = $zone->zoneLocations->count();
-
+         $employeeCount = $zone->zoneEmployees->count();
         return response()->json([
             'status' => true,
             'message' => 'Zone updated successfully!',
             'zone' => $zone,
             'location_count' => $locationCount,
+            'employee_count' => $employeeCount,
             'locations'       => $zone->zoneLocations->map(function ($loc) {
                 return [
                     'location_name' => $loc->location_name,
                     'status'        => $loc->status,
+                ];
+            }),
+            'employees' => $zone->zoneEmployees->map(function ($emp) {
+                return [
+                    'id'     => $emp->id,
+                    'name'   => $emp->employee->name ?? null,
+                    'status' => $emp->status,
                 ];
             }),
 
@@ -85,7 +94,7 @@ class ZoneController extends Controller
 
     // Get Location 
     public function getLocations($id){
-        $zone = Zone::with('zoneLocations')->findOrFail($id);
+        $zone = Zone::with(['zoneLocations.location_details','zoneEmployees.employee'])->findOrFail($id);
         return response()->json([
             'locations' => $zone->zoneLocations->map(function ($loc) {
                 return [
@@ -94,8 +103,16 @@ class ZoneController extends Controller
                     'status'        => $loc->status,
                 ];
             }),
+            'employees' => $zone->zoneEmployees->map(function ($emp) {
+                return [
+                    'id'            => $emp->id,      
+                    'employee_name' => $emp->employee->name ?? null,
+                    'status'        => $emp->status,
+                ];
+            }),
         ]);
     }
+    
 
 
     // Zone wise location
@@ -294,7 +311,8 @@ class ZoneController extends Controller
         $userlist = User::with([
             'supervisor:id,name,email',
             'zones:id,name',        // multiple zones if assigned
-            'locations.location_details'
+            'locations.location_details',
+            'complaints'
         ])
         ->select('id', 'name', 'mobile', 'email', 'password', 'role', 'status', 'supervisor_id')
         ->where('name', '!=', 'Super Admin') 
@@ -311,13 +329,19 @@ class ZoneController extends Controller
                         'email'        => 'required|email|unique:users,email',
                         'password'     => 'required|min:6',
                         'phone'        => 'required|digits:10',
+                        'alternate_number'        => 'required|digits:10',
                         'role'         => 'required|in:ho,supervisor,employee,complaint',
-                        'supervisor_id'=> 'required|exists:users,id',
+                        // 'supervisor_id'=> 'required|exists:users,id',
+                        'supervisor_id' => [
+                            Rule::requiredIf($request->role === 'employee'),
+                            'nullable',
+                            'exists:users,id',
+                        ],
                         'zone_id'       => 'required|array',
                         'zone_id.*'     => 'exists:zones,id',
                     ]);
 
-         \DB::beginTransaction();
+        \DB::beginTransaction();
         try {
             // Create Employee (assuming your User model holds employees too)
             $employee = User::create([
@@ -325,6 +349,7 @@ class ZoneController extends Controller
                 'email'        => $validated['email'],
                 'password'     => Hash::make($validated['password']),
                 'mobile'        => $validated['phone'],
+                'alternate_number'        => $validated['alternate_number'] ?? null,
                 'role'         => $validated['role'],
                 'supervisor_id'=> $validated['supervisor_id'] ?? null,
                 'status'       => 'active',

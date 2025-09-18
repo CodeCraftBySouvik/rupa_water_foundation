@@ -76,6 +76,15 @@
                                 @enderror
                             </div>
 
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Repairing</label><br>
+                                {!! pill('repairing','floor','Floor',old('repairing')) !!}
+                                {!! pill('repairing','machine','Machine',old('repairing')) !!}
+                                @error('repairing')
+                                <p class="text-danger small">{{$message}}</p>
+                                @enderror
+                            </div>
+
                             {{-- Electric available ------------------------------------------------ --}}
                             <div class="mb-3">
                                 <label class="form-label small text-muted">Electric available</label><br>
@@ -108,7 +117,7 @@
 
                             {{-- Tap & glass condition --------------------------------------------- --}}
                             <div class="mb-3">
-                                <label class="form-label small text-muted">Tap &amp; glass condition</label><br>
+                                <label class="form-label small text-muted">Tap condition</label><br>
                                 {!! pill('tap_glass_condition','present','Present',old('tap_glass_condition')) !!}
                                 {!! pill('tap_glass_condition','not
                                 present','Not&nbsp;Present',old('tap_glass_condition')) !!}

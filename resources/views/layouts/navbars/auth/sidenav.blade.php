@@ -194,9 +194,9 @@
                 </a>
             </li>
             {{-- User Management --}}
-            <li class="nav-item mt-3 d-flex align-items-center">
+            {{-- <li class="nav-item mt-3 d-flex align-items-center">
                 <div class="ps-4">
-                    {{-- <i class="fab fa-laravel" style="color: #f4645f;"></i> --}}
+                    
                 </div>
                 <h6 class="ms-2 text-uppercase text-xs font-weight-bolder opacity-6 mb-0">User Management</h6>
             </li>
@@ -209,7 +209,7 @@
                     </div>
                     <span class="nav-link-text ms-1">User List</span>
                 </a>
-            </li>
+            </li> --}}
             {{-- Location Content --}}
             <li class="nav-item mt-3 d-flex align-items-center">
                 <div class="ps-4">

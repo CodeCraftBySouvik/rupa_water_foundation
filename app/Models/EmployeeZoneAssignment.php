@@ -14,4 +14,9 @@ class EmployeeZoneAssignment extends Model
         'assigned_date',
         'transferred_date'
     ];
+
+    public function employee()
+    {
+        return $this->belongsTo(User::class, 'employee_id');
+    }
 }

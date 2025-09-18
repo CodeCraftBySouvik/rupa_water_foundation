@@ -18,12 +18,14 @@
         </div>
 
         <div class="card-body">
-            {{-- <div class="table-responsive"> --}}
+            <div class="table-responsive">
                 <table class="table align-items-center">
                     <thead>
                         <tr class="text-center">
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sl.No</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Name
+                            </th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Mobile
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Role
                             </th>
@@ -40,7 +42,7 @@
                         </tr>
                     </thead>
                     <tbody id="employeeList">
-                    
+
                         {{-- Dynamic employee rows will be prepended here --}}
                         @forelse($userlist as $key=> $data)
                         <tr class="text-center">
@@ -49,6 +51,9 @@
                             </td>
                             <td>
                                 <p class="text-xs font-weight-bold mb-0">{{ucwords($data->name)}}</p>
+                            </td>
+                            <td>
+                                <p class="text-xs font-weight-bold mb-0">{{ucwords($data->mobile)}}</p>
                             </td>
                             <td>
                                 <p class="text-xs font-weight-bold mb-0">{{ucwords($data->role)}}</p>
@@ -75,22 +80,145 @@
                                 </div>
                             </td>
                             <td class="text-center">
-                                <div class="dropdown dropup">
-                                    <button class="btn btn-sm btn-outline-secondary" type="button"
-                                        id="actionsDropdown{{ $data->id }}" data-bs-toggle="dropdown"
-                                        aria-expanded="false">
-                                        Actions
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="actionsDropdown{{ $data->id }}">
-                                        <li><a class="dropdown-item" href="#"
-                                                onclick="transferEmployee({{ $data->id }})">Transfer</a></li>
-                                        <li><a class="dropdown-item" href="#"
-                                                onclick="editEmployee({{ $data->id }})">Edit</a></li>
-                                        <li><a class="dropdown-item text-danger" href="#"
-                                                onclick="deleteEmployee({{ $data->id }})">Delete</a></li>
-                                    </ul>
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <div class="dropdown dropup">
+                                        <button class="btn btn-sm btn-outline-secondary" type="button"
+                                            id="actionsDropdown{{ $data->id }}" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="actionsDropdown{{ $data->id }}">
+                                            <li><a class="dropdown-item" href="#"
+                                                    onclick="transferEmployee({{ $data->id }})" data-bs-toggle="modal"
+                                                    data-bs-target="#transferModal{{ $data->id }}">Transfer</a></li>
+                                            <li><a class="dropdown-item" href="#"
+                                                    onclick="editEmployee({{ $data->id }})">Edit</a></li>
+                                            <li><a class="dropdown-item text-danger" href="#"
+                                                    onclick="deleteEmployee({{ $data->id }})">Delete</a></li>
+                                        </ul>
+                                    </div>
+                                    {{-- Show complaint button only if user has complaints --}}
+                                    @if ($data->complaints->isNotEmpty())
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button"
+                                            data-bs-toggle="modal" data-bs-target="#complaintModal{{ $data->id }}">
+                                            Complaint
+                                        </button>
+                                    </div>
+                                    @endif
                                 </div>
                             </td>
+                            {{-- Complaint Modal --}}
+                            <div class="modal fade" id="complaintModal{{ $data->id }}" tabindex="-1"
+                                aria-labelledby="complaintModalLabel{{ $data->id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="complaintModalLabel{{ $data->id }}">
+                                                Complaint Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            @foreach($data->complaints as $complaint)
+                                            <div class="mb-3 p-2 border rounded">
+                                                <p><strong>Description:</strong> {{ $complaint->description }}</p>
+                                                <p><strong>Date:</strong> {{ $complaint->created_at->format('d-m-Y H:i')
+                                                    }}</p>
+                                                <div class="d-flex flex-wrap">
+                                                    @php $images = json_decode($complaint->images, true); @endphp
+                                                    @if($images)
+                                                    @foreach($images as $img)
+                                                    <img src="{{ asset($img) }}" alt="Complaint Image"
+                                                        class="img-thumbnail me-2 mb-2"
+                                                        style="width: 100px; height: 100px;">
+                                                    @endforeach
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{-- Transfer Modal --}}
+                            <div class="modal fade" id="transferModal{{ $data->id }}" tabindex="-1"
+                                aria-labelledby="transferModalLabel{{ $data->id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="transferModalLabel{{ $data->id }}">
+                                                Transfer Employee
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+
+                                        <form method="POST" action="">
+                                            @csrf
+                                            <div class="modal-body">
+                                                <p>Request transfer for <strong>{{ $data->name }}</strong> to a
+                                                    different zone.</p>
+
+                                                {{-- From Zone --}}
+                                                <div class="mb-3">
+                                                    <label class="form-label">From Zone</label>
+                                                    <select class="form-select" name="from_zone" disabled>
+                                                        <option>{{ optional($data->zones->first())->name ?? 'Not
+                                                            Assigned' }}</option>
+                                                    </select>
+                                                </div>
+
+                                                {{-- To Zone --}}
+                                                <div class="mb-3">
+                                                    <label class="form-label">To Zone <span
+                                                            class="text-danger">*</span></label>
+                                                    <select class="form-select" name="to_zone" required>
+                                                        <option value="">Select Zone</option>
+                                                        @foreach($zones as $zone)
+                                                        <option value="{{ $zone->id }}">{{ $zone->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                {{-- New Location --}}
+                                                <div class="mb-3">
+                                                    <label class="form-label">New Location</label>
+                                                    <select class="form-select" name="new_location">
+                                                        <option value="">Select new location</option>
+                                                        {{-- You can populate dynamically based on zone --}}
+                                                    </select>
+                                                </div>
+
+                                                {{-- Effective Date --}}
+                                                <div class="mb-3">
+                                                    <label class="form-label">Effective Date <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="date" class="form-control" name="effective_date"
+                                                        required>
+                                                </div>
+
+                                                {{-- Reason for Transfer --}}
+                                                <div class="mb-3">
+                                                    <label class="form-label">Reason for Transfer</label>
+                                                    <textarea class="form-control" name="reason" rows="3"
+                                                        placeholder="Enter reason for transfer..."></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">Submit Transfer
+                                                    Request</button>
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+
                         </tr>
                         @empty
                         <tr>
@@ -101,10 +229,11 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{--
-            </div> --}}
+            </div>
         </div>
     </div>
+
+
 
 
     <!-- Add Employee Modal -->
@@ -154,6 +283,14 @@
                                 <div class="text-danger small" id="employee_phone_error"></div>
                             </div>
 
+                            <!--Alternate Phone -->
+                            <div class="col-md-6">
+                                <label for="employee_alternate_number" class="form-label">Alternate Number</label>
+                                <input type="text" class="form-control" name="alternate_number" placeholder="Enter Alternate number"
+                                    autocomplete="off">
+                                <div class="text-danger small" id="employee_alternate_number"></div>
+                            </div>
+
 
 
                             <!-- Role -->
@@ -186,7 +323,8 @@
                             <!-- Zone -->
                             <div class="col-md-6">
                                 <label for="employee_zone" class="form-label">Zone *</label>
-                                <select class="form-select" name="zone_id[]" id="employee_zone" multiple style="width: 100%;">
+                                <select class="form-select" name="zone_id[]" id="employee_zone" multiple
+                                    style="width: 100%;">
                                     <option value="" selected hidden>Select zone</option>
                                     @foreach($zones as $zone)
                                     <option value="{{ $zone->id }}">{{ $zone->name }}</option>
@@ -256,7 +394,8 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <select class="form-select" name="zone_id" id="edit_employee_zone" style="width: 100px;">
+                                <select class="form-select" name="zone_id" id="edit_employee_zone"
+                                    style="width: 100px;">
                                     <option value="" selected hidden>Select Zone</option>
                                     @foreach($zones as $zone)
                                     <option value="{{ $zone->id }}">{{ $zone->name }}</option>
@@ -343,7 +482,7 @@
 
                 // Prepend new employee row
                 $('#employeeList').append(newEmployeeHtml);
-                
+                location.reload();
                 }
             },
             error: function(xhr) {

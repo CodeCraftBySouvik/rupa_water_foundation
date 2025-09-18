@@ -83,13 +83,14 @@
                         <span><strong>Michael Chen</strong></span>
                     </p>
                     <div class="d-flex justify-content-between mt-3">
-                        <div>
-                            <h4 class="text-primary">312</h4>
-                            <small>Employees</small>
-                        </div>
+                        
                         <div>
                             <h4 class="text-primary">{{$zone->zone_locations_count}}</h4>
                             <small>Locations</small>
+                        </div>
+                        <div>
+                            <h4 class="text-primary">{{$zone->zone_employees_count}}</h4>
+                            <small>Employees</small>
                         </div>
                     </div>
 
@@ -176,6 +177,26 @@
             </div>
         </div>
     </div>
+    {{-- View Emplyees Modal --}}
+    <div class="modal fade" id="viewEmployeesModal" tabindex="-1" aria-labelledby="viewEmployeesModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Employees</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="employeesList" class="list-group">
+                        <!-- Employees will be appended dynamically here -->
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     {{-- <div class="row">
@@ -214,6 +235,40 @@
 
 @section('scripts')
 <script>
+      function viewEmployees(zoneId) {
+        let url = "{{ route('zone.getLocations', ':id') }}".replace(':id', zoneId);
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function(response) {
+                console.log(response);
+                $('#employeesList').empty();
+
+                if (response.employees.length > 0) {
+                    response.employees.forEach(function(employee) {
+                        $('#employeesList').append(`
+                            <li class="list-group-item">
+                                <strong>${employee.employee_name}</strong> - 
+                                <span class="badge ${employee.status === 'active' ? 'bg-success' : 'bg-danger'}">${employee.status}</span>
+                            </li>
+                        `);
+                    });
+                } else {
+                    $('#employeesList').append(`<li class="list-group-item">No employees found.</li>`);
+                }
+
+                $('#viewEmployeesModal').modal('show');
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Unable to fetch locations'
+                });
+            }
+        });
+    }
+
     function viewLocations(zoneId) {
     let url = "{{ route('zone.getLocations', ':id') }}".replace(':id', zoneId);
 
@@ -260,6 +315,7 @@
             method: 'POST',
             data: $(this).serialize(),
             success: function(response) {
+                console.log(response);
                 Swal.fire({
                     icon: 'success',
                     title: response.message,
@@ -284,13 +340,10 @@
                                 </div>
                             </div>
                             <p class="card-text mt-2">${response.zone.description || 'No description available.'}</p>
-                            <p class="d-flex justify-content-between mb-0">
-                                <strong><i class="ni ni-single-02 text-dark text-sm opacity-10"></i> Supervisor:</strong>
-                                <span><strong>Michael Chen</strong></span>
-                            </p>
+                           
                             <div class="d-flex justify-content-between mt-3">
-                                <div><h4 class="text-primary">312</h4><small>Employees</small></div>
                                 <div><h4 class="text-primary">${response.location_count}</h4><small>Locations</small></div>
+                                <div><h4 class="text-primary">${response.employee_count}</h4><small>Employees</small></div>
                             </div>
 
                             <div class="mt-3 d-flex justify-content-between">
@@ -354,8 +407,10 @@
 </script>
 <script>
     function toggleZoneStatus(zoneId){
+        let url = "{{ route('zone.toggleStatus' , ':id') }}";
+        url = url.replace(':id',zoneId);
         $.ajax({
-            url: '/zone/toggle-status/' + zoneId,
+            url: url,
             method: 'POST',
             data: {
                 _token: '{{ csrf_token() }}'

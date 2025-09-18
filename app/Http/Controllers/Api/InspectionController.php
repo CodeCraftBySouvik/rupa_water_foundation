@@ -51,6 +51,7 @@ class InspectionController extends Controller
     $rules = [
         'location_id'            => 'required|exists:locations,id',
         'checked_date'           => 'required|date',
+        'repairing'              => 'required|in:Floor,Machine',
         'water_quality'          => 'required|in:good,poor',
         'electric_available'     => 'required|in:yes,no',
         'cooling_system'         => 'required|in:working,not working',
