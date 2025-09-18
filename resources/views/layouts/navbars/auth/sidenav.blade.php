@@ -211,9 +211,8 @@
                 </a>
             </li> --}}
             {{-- Location Content --}}
-            <li class="nav-item mt-3 d-flex align-items-center">
+            {{-- <li class="nav-item mt-3 d-flex align-items-center">
                 <div class="ps-4">
-                    {{-- <i class="fab fa-laravel" style="color: #f4645f;"></i> --}}
                 </div>
                 <h6 class="ms-2 text-uppercase text-xs font-weight-bolder opacity-6 mb-0">Location Management</h6>
             </li>
@@ -226,7 +225,7 @@
                     </div>
                     <span class="nav-link-text ms-1">Location</span>
                 </a>
-            </li>
+            </li> --}}
 
             {{-- Inspection --}}
             <li class="nav-item mt-3 d-flex align-items-center">

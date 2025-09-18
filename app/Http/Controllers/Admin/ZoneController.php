@@ -144,84 +144,270 @@ class ZoneController extends Controller
         ]);
     }
 
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|mimetypes:text/plain,text/csv,application/csv,text/comma-separated-values,application/vnd.ms-excel',
-        ]);
+    // public function import(Request $request)
+    // {
+    //     $request->validate([
+    //         'file' => 'required|mimetypes:text/plain,text/csv,application/csv,text/comma-separated-values,application/vnd.ms-excel',
+    //     ]);
 
-        try {
-            $file = $request->file('file');
+    //     try {
+    //         $file = $request->file('file');
 
-            if (!$file || !$file->isValid()) {
-                throw new \Exception('Invalid file upload.');
+    //         if (!$file || !$file->isValid()) {
+    //             throw new \Exception('Invalid file upload.');
+    //         }
+
+    //         $path = $file->getRealPath();
+    //         $fileHandle = fopen($path, 'r');
+
+    //         $header = fgetcsv($fileHandle); // Skip header row
+
+    //         while ($row = fgetcsv($fileHandle)) {
+    //             if (count($row) < 4) {
+    //                 throw new \Exception('Invalid row format.');
+    //             }
+
+    //             $zoneName      = trim($row[0]); 
+    //             $locationTitle = trim($row[1]); 
+    //             $openingDate   = trim($row[2]); 
+    //             $size         = trim($row[3]); 
+
+    //             // Find the Zone by name
+    //             $zone = Zone::where('name', $zoneName)->first();
+    //             if (!$zone) {
+    //                 throw new \Exception("Zone '{$zoneName}' not found.");
+    //             }
+
+    //             // Find Location by title
+    //             $location = Location::where('title', $locationTitle)->first();
+    //             if (!$location) {
+    //                 throw new \Exception("Location '{$locationTitle}' not found.");
+    //             }
+
+    //             // Check if this zone-location combination already exists
+    //             $exists = ZoneWiseLocation::where('zone_id', $zone->id)
+    //                         ->where('location_id', $location->id)
+    //                         ->exists();
+
+    //             if ($exists) {
+    //                 // Skip this row if already exists
+    //                 continue;
+    //             }
+
+    //             $parsedDate = \DateTime::createFromFormat('d.m.y', $openingDate);
+    //             if (!$parsedDate) {
+    //                 throw new \Exception("Invalid date format at row: {$zoneName}, {$openingDate}");
+    //             }
+
+    //             ZoneWiseLocation::create([
+    //                 'zone_id'       => $zone->id,
+    //                 'location_id'   => $location->id,   // Match location by title
+    //                 'position'          => $size,
+    //                 'opening_date'  => $parsedDate->format('Y-m-d'),
+    //                 'status'        => 'active',
+    //             ]);
+    //         }
+
+    //         fclose($fileHandle);
+    //         return redirect()->back()->with('success', 'CSV imported successfully.');
+
+    //     } catch (\Exception $e) {
+    //         dd($e->getMessage());
+    //     }
+    // }
+
+//   public function import(Request $request)
+// {
+//     // $request->validate([
+//     //     'file' => 'required|mimetypes:text/plain,text/csv,application/csv,text/comma-separated-values,application/vnd.ms-excel',
+//     // ]);
+
+//     $errors = [];
+//     $inserted = 0;
+
+//     try {
+//         $file = $request->file('file');
+
+//         if (!$file || !$file->isValid()) {
+//             throw new \Exception('Invalid file upload.');
+//         }
+
+//         $path = $file->getRealPath();
+//         $fileHandle = fopen($path, 'r');
+
+//         $header = fgetcsv($fileHandle); // Skip header row
+
+//         while ($row = fgetcsv($fileHandle)) {
+//             if (count($row) < 4) {
+//                 $errors[] = "Invalid row format: " . implode(',', $row);
+//                 continue;
+//             }
+
+//             $zoneName      = trim($row[0]); 
+//             $locationTitle = trim($row[1]); 
+//             $openingDate   = trim($row[2]); 
+//             $size          = trim($row[3]); 
+
+//             try {
+//                 // Find Zone
+//                 $zone = Zone::where('name', $zoneName)->first();
+//                 if (!$zone) {
+//                     $errors[] = "Zone '{$zoneName}' not found.";
+//                     continue;
+//                 }
+
+//                 // Find or Create Location
+//                 $location = Location::where('title', $locationTitle)->first();
+
+//                 if (!$location) {
+//                     $lastId = Location::max('id') ?? 0;
+//                     $nextNumber = $lastId + 1;
+//                     $newLocationId = 'RUPA' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+//                     $location = Location::create([
+//                         'location_id' => $newLocationId,
+//                         'title'       => $locationTitle,
+//                         'position'       => $size,
+//                         'opening_date'       => $openingDate,
+//                         'status'      => 'active',
+//                     ]);
+//                 }
+
+//                 // Parse Date
+//                 $parsedDate = \DateTime::createFromFormat('d.m.y', $openingDate);
+//                 if (!$parsedDate) {
+//                     $errors[] = "Invalid date format: {$zoneName}, {$openingDate}";
+//                     continue;
+//                 }
+
+//                 // Always insert (no duplicate check)
+//                 ZoneWiseLocation::create([
+//                     'zone_id'       => $zone->id,
+//                     'location_id'   => $location->id,
+//                     'position'      => $size,
+//                     'opening_date'  => $parsedDate->format('Y-m-d'),
+//                     'status'        => 'active',
+//                 ]);
+
+//                 $inserted++;
+
+//             } catch (\Exception $ex) {
+//                 $errors[] = "Row failed: " . implode(',', $row) . " | Error: " . $ex->getMessage();
+//                 continue;
+//             }
+//         }
+
+//         fclose($fileHandle);
+
+//         return redirect()->back()->with([
+//             'success'  => "CSV imported successfully. Inserted: {$inserted}, Errors: " . count($errors),
+//             'errors'   => $errors
+//         ]);
+
+//     } catch (\Exception $e) {
+//         return redirect()->back()->with('error', $e->getMessage());
+//     }
+// }
+
+public function import(Request $request)
+{
+    // $request->validate([
+    //     'file' => 'required|mimetypes:text/plain,text/csv,application/csv,text/comma-separated-values,application/vnd.ms-excel',
+    // ]);
+
+    $errors = [];
+    $inserted = 0;
+
+    try {
+        $file = $request->file('file');
+
+        if (!$file || !$file->isValid()) {
+            throw new \Exception('Invalid file upload.');
+        }
+
+        $path = $file->getRealPath();
+        $fileHandle = fopen($path, 'r');
+
+        $header = fgetcsv($fileHandle); // Skip header row
+
+        while ($row = fgetcsv($fileHandle)) {
+            if (count($row) < 4) {
+                $errors[] = "Invalid row format: " . implode(',', $row);
+                continue;
             }
 
-            $path = $file->getRealPath();
-            $fileHandle = fopen($path, 'r');
+            $zoneName      = trim($row[0]); 
+            $locationTitle = trim($row[1]); 
+            $openingDate   = trim($row[2]); 
+            $size          = trim($row[3]); 
 
-            $header = fgetcsv($fileHandle); // Skip header row
-
-            while ($row = fgetcsv($fileHandle)) {
-                if (count($row) < 4) {
-                    throw new \Exception('Invalid row format.');
-                }
-
-                $zoneName      = trim($row[0]); 
-                $locationTitle = trim($row[1]); 
-                $openingDate   = trim($row[2]); 
-                $size         = trim($row[3]); 
-
-                // Find the Zone by name
+            try {
+                // Find Zone
                 $zone = Zone::where('name', $zoneName)->first();
                 if (!$zone) {
-                    throw new \Exception("Zone '{$zoneName}' not found.");
-                }
-
-                // Find Location by title
-                $location = Location::where('title', $locationTitle)->first();
-                if (!$location) {
-                    throw new \Exception("Location '{$locationTitle}' not found.");
-                }
-
-                // Check if this zone-location combination already exists
-                $exists = ZoneWiseLocation::where('zone_id', $zone->id)
-                            ->where('location_id', $location->id)
-                            ->exists();
-
-                if ($exists) {
-                    // Skip this row if already exists
+                    $errors[] = "Zone '{$zoneName}' not found.";
                     continue;
                 }
 
+                // Generate new Location always (even if duplicate)
+                $lastId = Location::max('id') ?? 0;
+                $nextNumber = $lastId + 1;
+                $newLocationId = 'RUPA' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+                $location = Location::create([
+                    'location_id'   => $newLocationId,
+                    'title'         => $locationTitle,
+                    'position'      => $size,
+                    'opening_date'  => $openingDate,
+                    'status'        => 'active',
+                ]);
+
+                // Parse date safely
                 $parsedDate = \DateTime::createFromFormat('d.m.y', $openingDate);
                 if (!$parsedDate) {
-                    throw new \Exception("Invalid date format at row: {$zoneName}, {$openingDate}");
+                    $errors[] = "Invalid date format: {$zoneName}, {$openingDate}";
+                    continue;
                 }
 
+                // Always insert ZoneWiseLocation (duplicates allowed)
                 ZoneWiseLocation::create([
                     'zone_id'       => $zone->id,
-                    'location_id'   => $location->id,   // Match location by title
-                    'position'          => $size,
+                    'location_id'   => $location->id,
+                    'position'      => $size,
                     'opening_date'  => $parsedDate->format('Y-m-d'),
                     'status'        => 'active',
                 ]);
+
+                $inserted++;
+
+            } catch (\Exception $ex) {
+                $errors[] = "Row failed: " . implode(',', $row) . " | Error: " . $ex->getMessage();
+                continue;
             }
-
-            fclose($fileHandle);
-            return redirect()->back()->with('success', 'CSV imported successfully.');
-
-        } catch (\Exception $e) {
-            dd($e->getMessage());
         }
+
+        fclose($fileHandle);
+
+        return redirect()->back()->with([
+            'success'  => "CSV imported successfully. Inserted: {$inserted}, Errors: " . count($errors),
+            'import_errors'   => $errors
+        ]);
+
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', $e->getMessage());
     }
+}
+
+
+
+
 
 
 
     public function zoneWiseLocationIndex(Request $request){
         $getZones = Zone::latest()->get();
         $getLocations = Location::all();
-         $locations = ZoneWiseLocation::with('location_details')->latest()->paginate(20);
+         $locations = ZoneWiseLocation::with('location_details')->latest()->get();
          
          $editLocation = null;
          if($request->has('edit')){

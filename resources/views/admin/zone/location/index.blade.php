@@ -4,10 +4,20 @@
 @include('layouts.navbars.auth.topnav', ['title' => 'Zone Wise Location Management'])
 <div class="container-fluid py-4">
     <div class="row">
-        <div class="col-8">
+        <div class="col-12">
             <div class="card mb-4">
                 <div id="alert">
                     @include('components.alert')
+                    @if(session('import_errors'))
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach(session('import_errors') as $err)
+                                    <li>{{ $err }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                 </div>
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6>Zone Wise Location</h6>
@@ -129,7 +139,7 @@
                         </div>
                     </div>
                 </div> --}}
-                <div class="card-body px-0 pt-0 pb-2">
+                {{-- <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
                         @forelse($locations->groupBy(function($data) {
                         return $data->zone_name ? $data->zone_name->name : 'Unknown Zone';
@@ -193,13 +203,97 @@
                             {{ $locations->links() }}
                         </div>
                     </div>
+                </div> --}}
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        @php
+                        $groupedZones = $locations->groupBy(function($data) {
+                        return $data->zone_name ? $data->zone_name->name : 'Unknown Zone';
+                        });
+                        @endphp
+
+                        {{-- Zone Tabs --}}
+                        <ul class="nav nav-tabs" id="zoneTabs" role="tablist">
+                            @foreach($groupedZones as $zoneName => $zoneLocations)
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {{ $loop->first ? 'active' : '' }}"
+                                    id="tab-{{ Str::slug($zoneName) }}" data-bs-toggle="tab"
+                                    data-bs-target="#content-{{ Str::slug($zoneName) }}" type="button" role="tab">
+                                    {{ $zoneName }}
+                                </button>
+                            </li>
+                            @endforeach
+                        </ul>
+
+                        {{-- Zone Content --}}
+                        <div class="tab-content mt-3" id="zoneTabContent">
+                            @foreach($groupedZones as $zoneName => $zoneLocations)
+                            <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                                id="content-{{ Str::slug($zoneName) }}" role="tabpanel">
+
+                                <table class="table align-items-center mb-0">
+                                    <thead>
+                                        <tr class="text-center">
+                                            <th>Sl.No</th>
+                                            <th>Location</th>
+                                            <th>Position</th>
+                                            <th>Opening Date</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($zoneLocations as $index => $data)
+                                        <tr class="text-center" id="location-row-{{ $data->id }}">
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>
+                                                <span class="badge badge-sm bg-gradient-info">
+                                                    {{ $data->location_details ? $data->location_details->title : '-' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-sm bg-gradient-success">
+                                                    {{ $data->location_details ? $data->location_details->position : '-' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-sm bg-gradient-success">
+                                                    {{ $data->location_details ? $data->location_details->opening_date : '-' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch d-flex justify-content-center">
+                                                    <input type="checkbox" class="form-check-input"
+                                                        id="statusSwitch{{ $data->id }}" {{ $data->status === 'Active' ?
+                                                    'checked' : '' }}
+                                                    onchange="toggleLocationStatus({{ $data->id }}, this.checked)">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('zone.location.index', ['edit' => $data->id]) }}"
+                                                    style="margin-right: 8px;">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                <a href="javascript:void(0);" onclick="deleteLocation({{ $data->id }})">
+                                                    <i class="fa fa-trash text-danger"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
 
             </div>
         </div>
         {{-- --}}
 
-        <div class="col-md-4">
+        {{-- <div class="col-md-4">
             <form method="POST"
                 action="{{ isset($editLocation) ? route('zone.location.update', $editLocation->id) : route('zone.location.store') }}">
                 @csrf
@@ -225,7 +319,6 @@
                                     @enderror
                                 </div>
                             </div>
-                            {{-- Locations --}}
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="location_id" class="form-control-label">Location</label>
@@ -255,7 +348,7 @@
                     </div>
                 </div>
             </form>
-        </div>
+        </div> --}}
 
     </div>
     {{-- @include('layouts.footers.auth.footer') --}}

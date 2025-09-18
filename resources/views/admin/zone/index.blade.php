@@ -35,11 +35,7 @@
                             <div class="text-danger small" id="zone_name_error"></div>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label for="description" class="form-control-label">Description</label>
-                            <textarea class="form-control" name="description" id="description"></textarea>
-                            <div class="text-danger small" id="description_error"></div>
-                        </div>
+                     
                     </div>
 
                     <div class="modal-footer">
@@ -71,17 +67,7 @@
                         </div>
 
                     </div>
-                    {{-- <h6 class="card-subtitle text-muted">Zone Code: ZONE001</h6> --}}
-                    @if ($zone->description)
-                    <p class="card-text mt-2">{{$zone->description}}</p>
-                    @else
-                    <p class="card-text mt-2">No description available.</p>
-                    @endif
-                    <p class="d-flex justify-content-between mb-0">
-
-                        <strong><i class="ni ni-single-02 text-dark text-sm opacity-10"></i> Supervisor:</strong>
-                        <span><strong>Michael Chen</strong></span>
-                    </p>
+                 
                     <div class="d-flex justify-content-between mt-3">
                         
                         <div>
@@ -139,11 +125,7 @@
                                 <div class="text-danger small" id="edit_zone_name_error"></div>
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label for="edit_description" class="form-control-label">Description</label>
-                                <textarea class="form-control" name="description" id="edit_description"></textarea>
-                                <div class="text-danger small" id="edit_description_error"></div>
-                            </div>
+                            
                         </div>
 
                         <div class="modal-footer">
@@ -199,36 +181,7 @@
     </div>
 
 
-    {{-- <div class="row">
-        <div class="col-md-4">
-            <form method="POST" action="{{ route('zone.store') }}" enctype="multipart/form-data">
-                @csrf
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h6 class="text-uppercase text-sm mb-3">Create Zone</h6>
-
-                        <div class="form-group mb-3">
-                            <label for="zone_name" class="form-control-label">Zone Name</label>
-                            <input type="text" class="form-control" name="zone_name" value="{{ old('zone_name') }}">
-                            @error('zone_name')
-                            <p class="text-danger small">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label for="description" class="form-control-label">Description</label>
-                            <textarea class="form-control" name="description">{{ old('description') }}</textarea>
-                            @error('description')
-                            <p class="text-danger small">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-sm">Save</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div> --}}
+   
 
 </div>
 @endsection
@@ -308,7 +261,6 @@
     $('#editZoneForm').on('submit', function(e){
         e.preventDefault();
         $('#edit_zone_name_error').text('');
-        $('#edit_description_error').text('');
 
         $.ajax({
             url: "{{ route('zone.update') }}",
@@ -339,7 +291,7 @@
                                     </a>
                                 </div>
                             </div>
-                            <p class="card-text mt-2">${response.zone.description || 'No description available.'}</p>
+                           
                            
                             <div class="d-flex justify-content-between mt-3">
                                 <div><h4 class="text-primary">${response.location_count}</h4><small>Locations</small></div>
@@ -369,9 +321,7 @@
                 if (errors.name) {
                     $('#edit_zone_name_error').text(errors.name[0]);
                 }
-                if (errors.description) {
-                    $('#edit_description_error').text(errors.description[0]);
-                }
+                
             }
         });
     });
@@ -389,7 +339,6 @@
         success: function(response) {
             $('#edit_zone_id').val(response.id);
             $('#edit_zone_name').val(response.name);
-            $('#edit_description').val(response.description || '');
             $('#editZoneModal').modal('show');
         },
        error: function (xhr) {
@@ -397,9 +346,7 @@
             if (errors.name) {
                 $('#edit_zone_name_error').text(errors.name[0]);
             }
-            if (errors.description) {
-                $('#edit_description_error').text(errors.description[0]);
-            }
+            
         }
     });
 }
@@ -434,7 +381,6 @@
        $('#addZoneForm').on('submit', function(e){
           e.preventDefault();
             $('#zone_name_error').text('');
-            $('#description_error').text('');
 
             $.ajax({
                 url: "{{ route('zone.store') }}",
@@ -468,7 +414,7 @@
                                                 </a>
                                             </div>
                                         </div>
-                                        <p class="card-text mt-2">${response.description || 'No description available.'}</p>
+                                      
                                         <p class="d-flex justify-content-between mb-0">
                                             <strong><i class="ni ni-single-02 text-dark text-sm opacity-10"></i> Supervisor:</strong>
                                             <span><strong>Michael Chen</strong></span>
@@ -495,9 +441,7 @@
                     if (errors.name) {
                         $('#zone_name_error').text(errors.name[0]);
                     }
-                    if (errors.description) {
-                        $('#description_error').text(errors.description[0]);
-                    }
+                   
                 }
             });
        }); 
