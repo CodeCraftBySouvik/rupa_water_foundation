@@ -2,7 +2,7 @@
 
 @section('content')
 
-@include('layouts.navbars.auth.topnav', ['title' => 'Zones'])
+{{-- @include('layouts.navbars.auth.topnav', ['title' => 'Zones']) --}}
 
 <div class="container-fluid py-4">
     <div id="alert">
@@ -50,7 +50,7 @@
     <div class="row" id="zonesList">
         {{-- @if (count($zones)>0) --}}
         @forelse($zones as $index => $zone)
-        <div class="col-md-6 mb-4" id="zone-card-{{ $zone->id }}">
+        <div class="col-md-4 mb-4" id="zone-card-{{ $zone->id }}">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">

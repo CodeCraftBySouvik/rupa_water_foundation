@@ -2,7 +2,7 @@
 
 @section('content')
 
-@include('layouts.navbars.auth.topnav', ['title' => 'Zones'])
+{{-- @include('layouts.navbars.auth.topnav', ['title' => 'Zones']) --}}
 
 <div class="container-fluid py-4">
     <div id="alert">
@@ -91,8 +91,12 @@
                                             <li><a class="dropdown-item" href="#"
                                                     onclick="transferEmployee({{ $data->id }})" data-bs-toggle="modal"
                                                     data-bs-target="#transferModal{{ $data->id }}">Transfer</a></li>
-                                            <li><a class="dropdown-item" href="#"
-                                                    onclick="editEmployee({{ $data->id }})">Edit</a></li>
+                                            <li>
+                                                <a class="dropdown-item" href="#"
+                                                    onclick="editEmployee({{ $data->id }})" data-bs-toggle="modal"
+                                                    data-bs-target="#editEmployeeModal">Edit</a>
+                                            </li>
+
                                             <li><a class="dropdown-item text-danger" href="#"
                                                     onclick="deleteEmployee({{ $data->id }})">Delete</a></li>
                                         </ul>
@@ -286,8 +290,8 @@
                             <!--Alternate Phone -->
                             <div class="col-md-6">
                                 <label for="employee_alternate_number" class="form-label">Alternate Number</label>
-                                <input type="text" class="form-control" name="alternate_number" placeholder="Enter Alternate number"
-                                    autocomplete="off">
+                                <input type="text" class="form-control" name="alternate_number"
+                                    placeholder="Enter Alternate number" autocomplete="off">
                                 <div class="text-danger small" id="employee_alternate_number"></div>
                             </div>
 
@@ -350,7 +354,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <form id="editEmployeeForm">
                 @csrf
-                <input type="hidden" name="employee_id" id="edit_employee_id">
+                <input type="hidden" name="edit_employee_id" id="edit_employee_id">
 
                 <div class="modal-content">
                     <div class="modal-header">
@@ -360,49 +364,81 @@
 
                     <div class="modal-body">
                         <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Full Name *</label>
-                                <input type="text" class="form-control" name="name" id="edit_employee_name">
+                            <!-- Full Name -->
+                            <div class="col-md-6">
+                                <label for="edit_employee_name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" name="edit_name" id="edit_employee_name"
+                                    placeholder="Enter full name">
                                 <div class="text-danger small" id="edit_employee_name_error"></div>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Email *</label>
-                                <input type="email" class="form-control" name="email" id="edit_employee_email">
-                                <div class="text-danger small" id="edit_employee_email_error"></div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Phone *</label>
-                                <input type="phone" class="form-control" name="phone" id="edit_employee_phone">
-                                <div class="text-danger small" id="edit_employee_phone_error"></div>
-                            </div>
+
+                            <!-- Email -->
                             <div class="col-md-6">
-                                <select class="form-select" name="role" id="edit_employee_role">
+                                <label for="edit_employee_email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" name="edit_email" id="edit_employee_email"
+                                    placeholder="Enter email">
+                                <div class="text-danger small" id="edit_employee_email"></div>
+                            </div>
+                            <input type="text" name="fakeusernameremembered" style="display:none;">
+                            <input type="password" name="fakepasswordremembered" style="display:none;">
+
+                            <!-- Phone -->
+                            <div class="col-md-6">
+                                <label for="edit_employee_phone" class="form-label">Phone</label>
+                                <input type="text" class="form-control" name="edit_phone" placeholder="Enter phone number"
+                                    autocomplete="off">
+                                <div class="text-danger small" id="edit_employee_phone"></div>
+                            </div>
+
+                            <!--Alternate Phone -->
+                            <div class="col-md-6">
+                                <label for="edit_employee_alternate_number" class="form-label">Alternate Number</label>
+                                <input type="text" class="form-control" name="edit_alternate_number"
+                                    placeholder="Enter Alternate number" autocomplete="off">
+                                <div class="text-danger small" id="edit_employee_alternate_number"></div>
+                            </div>
+
+
+
+                            <!-- Role -->
+                            <div class="col-md-6">
+                                <label for="edit_employee_role" class="form-label">Role *</label>
+                                <select class="form-select" name="edit_role" id="edit_employee_role">
                                     <option value="">Select role</option>
                                     <option value="supervisor">Supervisor</option>
                                     <option value="employee">Employee</option>
                                     <option value="complaint">Complaint</option>
                                 </select>
+                                <div class="text-danger small" id="edit_employee_role_error"></div>
                             </div>
+
+                            <!-- Supervisor -->
                             <div class="col-md-6">
-                                <select class="form-select" name="supervisor_id" id="edit_employee_supervisor">
+                                <label for="edit_employee_supervisor" class="form-label">Supervisor</label>
+                                <select class="form-select" name="edit_supervisor_id" id="edit_employee_supervisor">
                                     <option value="" selected hidden>Select Supervisor</option>
                                     @foreach($supervisors as $supervisor)
-                                    <option value="{{ $supervisor->id }}">{{ $supervisor->name }} ({{ $supervisor->email
-                                        }})
+                                    <option value="{{ $supervisor->id }}">
+                                        {{ $supervisor->name }} ({{ $supervisor->email }})
                                     </option>
                                     @endforeach
                                 </select>
+                                <div class="text-danger small" id="edit_employee_supervisor_error"></div>
                             </div>
+
+
+                            <!-- Zone -->
                             <div class="col-md-6">
-                                <select class="form-select" name="zone_id" id="edit_employee_zone"
-                                    style="width: 100px;">
-                                    <option value="" selected hidden>Select Zone</option>
+                                <label for="edit_employee_zone" class="form-label">Zone *</label>
+                                <select class="form-select" name="edit_zone_id[]" id="edit_employee_zone" multiple
+                                    style="width: 100%;">
+                                    <option value="" selected hidden>Select zone</option>
                                     @foreach($zones as $zone)
                                     <option value="{{ $zone->id }}">{{ $zone->name }}</option>
                                     @endforeach
                                 </select>
+                                <div class="text-danger small" id="edit_employee_zone_error"></div>
                             </div>
-
                         </div>
                     </div>
 
@@ -423,6 +459,49 @@
         allowClear: true,
         dropdownParent: $('#addEmployeeModal')
     });
+    $('#edit_employee_zone').select2({
+        allowClear: true,
+        dropdownParent: $('#editEmployeeModal')
+    });
+
+     // Function to fetch employee data and populate edit form
+    function editEmployee(id) {
+        let url = "{{ route('zone.employee.edit', ':id') }}".replace(':id', id);
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            success: function(response) {
+                if (response.data) {
+                    let employee = response.data;
+                    
+                    // Fill modal fields
+                    $('#edit_employee_id').val(employee.id);
+                    $('#edit_employee_name').val(employee.name);
+                    $('#edit_employee_email').val(employee.email);
+                    $('#edit_employee_phone').val(employee.mobile);
+                    $('#edit_employee_alternate_number').val(employee.alternate_number);
+                    $('#edit_employee_role').val(employee.role);
+                    $('#edit_employee_supervisor').val(employee.supervisor_id);
+                    
+                    // Set zones (multiple select)
+                    let zoneIds = employee.zone_id || [];
+                    $('#edit_employee_zone').val(zoneIds).trigger('change');
+
+                    // Open modal
+                    $('#editEmployeeModal').modal('show');
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Failed to fetch employee data.'
+                });
+            }
+        });
+    }
+
     // Handle form submission
         $('#addEmployeeForm').submit(function(e) {
         e.preventDefault();

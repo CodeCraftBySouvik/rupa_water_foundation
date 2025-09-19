@@ -572,9 +572,8 @@ public function import(Request $request)
     public function zoneWiseEmployeeEdit($id)
     {
         $employee = User::with(['zones', 'locations'])->findOrFail($id);
-
-        $zoneId     = $employee->zones->first()->id ?? null;
-        $locationId = $employee->locations->first()->id ?? null;
+         $zoneIds     = $employee->zones->pluck('id')->toArray();   // All zone IDs
+    $locationIds = $employee->locations->pluck('id')->toArray(); 
 
         return response()->json([
             'id'            => $employee->id,
@@ -583,8 +582,8 @@ public function import(Request $request)
             'mobile'        => $employee->mobile,
             'role'          => $employee->role,
             'supervisor_id' => $employee->supervisor_id,
-            'zone_id'       => $zoneId,
-            'location_id'   => $locationId,
+            'zone_id'       => $zoneIds,
+            'location_id'   => $locationIds,
         ]);
     }
 

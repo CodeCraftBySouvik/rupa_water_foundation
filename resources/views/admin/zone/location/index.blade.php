@@ -1,7 +1,7 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-@include('layouts.navbars.auth.topnav', ['title' => 'Zone Wise Location Management'])
+{{-- @include('layouts.navbars.auth.topnav', ['title' => 'Zone Wise Location Management']) --}}
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
@@ -9,13 +9,13 @@
                 <div id="alert">
                     @include('components.alert')
                     @if(session('import_errors'))
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach(session('import_errors') as $err)
-                                    <li>{{ $err }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach(session('import_errors') as $err)
+                            <li>{{ $err }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                     @endif
 
                 </div>
@@ -210,8 +210,11 @@
                         $groupedZones = $locations->groupBy(function($data) {
                         return $data->zone_name ? $data->zone_name->name : 'Unknown Zone';
                         });
+                        $totalLocations = collect($groupedZones)->flatten()->count();
                         @endphp
-
+                        <div class="d-flex justify-content-between align-items-center mb-2 ms-2">
+                            <h6>Total Locations: <span class="badge bg-primary">{{ $totalLocations }}</span></h6>
+                        </div>
                         {{-- Zone Tabs --}}
                         <ul class="nav nav-tabs" id="zoneTabs" role="tablist">
                             @foreach($groupedZones as $zoneName => $zoneLocations)
@@ -220,6 +223,7 @@
                                     id="tab-{{ Str::slug($zoneName) }}" data-bs-toggle="tab"
                                     data-bs-target="#content-{{ Str::slug($zoneName) }}" type="button" role="tab">
                                     {{ $zoneName }}
+                                    <span class="badge bg-secondary">{{ count($zoneLocations) }}</span>
                                 </button>
                             </li>
                             @endforeach
@@ -253,12 +257,14 @@
                                             </td>
                                             <td>
                                                 <span class="badge badge-sm bg-gradient-success">
-                                                    {{ $data->location_details ? $data->location_details->position : '-' }}
+                                                    {{ $data->location_details ? $data->location_details->position : '-'
+                                                    }}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span class="badge badge-sm bg-gradient-success">
-                                                    {{ $data->location_details ? $data->location_details->opening_date : '-' }}
+                                                    {{ $data->location_details ? $data->location_details->opening_date :
+                                                    '-' }}
                                                 </span>
                                             </td>
                                             <td>

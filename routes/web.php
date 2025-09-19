@@ -89,7 +89,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/update', [ZoneController::class, 'update'])->name('update');
 		Route::post('/toggle-status/{id}', [ZoneController::class, 'toggleStatus'])->name('toggleStatus');
 		Route::get('/locations/{id}', [ZoneController::class, 'getLocations'])->name('getLocations');
-
+		
 		// zone wise location
 		Route::get('/location', [ZoneController::class, 'zoneWiseLocationIndex'])->name('location.index');
 		Route::get('/location/sample-csv', [ZoneController::class, 'downloadSampleCsv'])->name('location.sample');

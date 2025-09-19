@@ -1,7 +1,7 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-@include('layouts.navbars.auth.topnav', ['title' => 'About Us'])
+{{-- @include('layouts.navbars.auth.topnav', ['title' => 'About Us']) --}}
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-8">
@@ -27,20 +27,23 @@
                             <tbody>
                                 @if ($about)
                                 <tr>
-                                    <td>
+                                    <td style="white-space: normal; word-break: break-word;">
                                         <div class="d-flex px-2 py-1">
-
                                             <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">{{$about->title}}</h6>
+                                                <h6 class="mb-0 text-sm">
+                                                   {!! html_entity_decode($about->title) !!}
+                                                </h6>
                                             </div>
                                         </div>
                                     </td>
+
                                     <td>
-                                        <p class="text-xs font-weight-bold mb-0">{{Str::limit($about->description,60)}}</p>
+                                        <p class="text-xs font-weight-bold mb-0">{{strip_tags(Str::limit($about->description,60))}}
+                                        </p>
 
                                     </td>
                                 </tr>
-                               
+
                                 @endif
 
 
@@ -62,19 +65,20 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="example-text-input" class="form-control-label">Title</label>
-                                    <input class="form-control" type="text" name="title" value="{{ old('title', $aboutUs?->title ?? '') }}">
+                                    <textarea class="form-control" id="title" name="title"
+                                        value="">{{ old('title', $aboutUs?->title ?? '') }}</textarea>
                                     @error('title')
-                                        <p class="text-danger small">{{$message}}</p>
+                                    <p class="text-danger small">{{$message}}</p>
                                     @enderror
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="example-text-input" class="form-control-label">Description</label>
-                                    <textarea class="form-control" rows="4"
+                                    <textarea id="description" class="form-control" rows="4"
                                         name="description">{{ old('description', $aboutUs?->description ?? '') }}</textarea>
                                     @error('description')
-                                        <p class="text-danger small">{{$message}}</p>
+                                    <p class="text-danger small">{{$message}}</p>
                                     @enderror
                                 </div>
                             </div>
@@ -91,4 +95,19 @@
     </div>
     {{-- @include('layouts.footers.auth.footer') --}}
 </div>
+@endsection
+@section('scripts')
+<script>
+    ClassicEditor
+            .create(document.querySelector('#title'))
+            .catch(error => {
+                console.error(error);
+            });
+    ClassicEditor
+            .create(document.querySelector('#description'))
+            .catch(error => {
+                console.error(error);
+            });
+</script>
+
 @endsection

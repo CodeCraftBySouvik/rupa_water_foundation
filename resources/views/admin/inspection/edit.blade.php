@@ -1,6 +1,6 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 @section('content')
-@include('layouts.navbars.auth.topnav', ['title' => 'Edit Inspection'])
+{{-- @include('layouts.navbars.auth.topnav', ['title' => 'Edit Inspection']) --}}
 
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
@@ -67,6 +67,13 @@
                         <div class="row row-cols-1 row-cols-md-4 g-3">
                             {{-- Each field --}}
                             <div class="mb-3">
+                                <label class="form-label small text-muted">Repairing</label><br>
+                                {!! pill('repairing','Floor','Floor', old('repairing', $inspection->repairing)) !!}
+                                {!! pill('repairing','Machine','Machine', old('repairing', $inspection->repairing)) !!}
+                                @error('repairing') <p class="text-danger small">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="form-label small text-muted">Water quality</label><br>
                                 {!! pill('water_quality','good','Good', old('water_quality', $inspection->water_quality)) !!}
                                 {!! pill('water_quality','poor','Poor', old('water_quality', $inspection->water_quality)) !!}
@@ -95,10 +102,10 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label small text-muted">Tap &amp; glass condition</label><br>
-                                {!! pill('tap_glass_condition','present','Present', old('tap_glass_condition', $inspection->tap_glass_condition)) !!}
-                                {!! pill('tap_glass_condition','not present','Not Present', old('tap_glass_condition', $inspection->tap_glass_condition)) !!}
-                                @error('tap_glass_condition') <p class="text-danger small">{{ $message }}</p> @enderror
+                                <label class="form-label small text-muted">Tap condition</label><br>
+                                {!! pill('tap_condition','present','Present', old('tap_condition', $inspection->tap_condition)) !!}
+                                {!! pill('tap_condition','not present','Not Present', old('tap_condition', $inspection->tap_condition)) !!}
+                                @error('tap_condition') <p class="text-danger small">{{ $message }}</p> @enderror
                             </div>
 
                             <div class="mb-3">
