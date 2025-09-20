@@ -472,9 +472,8 @@
             url: url,
             type: "GET",
             success: function(response) {
-                if (response.data) {
-                    let employee = response.data;
-                    
+                if (response) {
+                    let employee = response;
                     // Fill modal fields
                     $('#edit_employee_id').val(employee.id);
                     $('#edit_employee_name').val(employee.name);
@@ -501,6 +500,57 @@
             }
         });
     }
+
+       $('#edit_employee_zone').select2({
+       allowClear: true,
+       dropdownParent: $('#editEmployeeModal')
+   });
+
+   // Edit form submission
+   $('#editEmployeeForm').submit(function(e) {
+       e.preventDefault();
+       // Clear previous errors
+       $('.text-danger.small').text('');
+
+       let employeeId = $('#edit_employee_id').val();
+       let url = "{{ route('zone.employee.update', ':id') }}".replace(':id', employeeId);
+       let formData = $(this).serialize() + '&_method=PUT';
+
+       $.ajax({
+           url: url,
+           type: 'POST',
+           data: formData,
+           success: function(response) {
+               if (response.success) {
+                   $('#editEmployeeModal').modal('hide');
+                   Swal.fire({
+                       icon: 'success',
+                       title: 'Success!',
+                       text: response.message,
+                       timer: 2000,
+                       showConfirmButton: false
+                   }).then(() => {
+                       location.reload();
+                   });
+               }
+           },
+           error: function(xhr) {
+               if (xhr.status === 422) {
+                   let errors = xhr.responseJSON.errors;
+                   $.each(errors, function(key, messages) {
+                       let errorFieldId = '#edit_employee_' + key + '_error';
+                       $(errorFieldId).text(messages[0]);
+                   });
+               } else {
+                   Swal.fire({
+                       icon: 'error',
+                       title: 'Oops...',
+                       text: 'An unexpected error occurred. Please try again.'
+                   });
+               }
+           }
+       });
+   });
 
     // Handle form submission
         $('#addEmployeeForm').submit(function(e) {
