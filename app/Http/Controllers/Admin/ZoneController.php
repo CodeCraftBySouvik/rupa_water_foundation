@@ -144,177 +144,11 @@ class ZoneController extends Controller
         ]);
     }
 
-    // public function import(Request $request)
-    // {
-    //     $request->validate([
-    //         'file' => 'required|mimetypes:text/plain,text/csv,application/csv,text/comma-separated-values,application/vnd.ms-excel',
-    //     ]);
-
-    //     try {
-    //         $file = $request->file('file');
-
-    //         if (!$file || !$file->isValid()) {
-    //             throw new \Exception('Invalid file upload.');
-    //         }
-
-    //         $path = $file->getRealPath();
-    //         $fileHandle = fopen($path, 'r');
-
-    //         $header = fgetcsv($fileHandle); // Skip header row
-
-    //         while ($row = fgetcsv($fileHandle)) {
-    //             if (count($row) < 4) {
-    //                 throw new \Exception('Invalid row format.');
-    //             }
-
-    //             $zoneName      = trim($row[0]); 
-    //             $locationTitle = trim($row[1]); 
-    //             $openingDate   = trim($row[2]); 
-    //             $size         = trim($row[3]); 
-
-    //             // Find the Zone by name
-    //             $zone = Zone::where('name', $zoneName)->first();
-    //             if (!$zone) {
-    //                 throw new \Exception("Zone '{$zoneName}' not found.");
-    //             }
-
-    //             // Find Location by title
-    //             $location = Location::where('title', $locationTitle)->first();
-    //             if (!$location) {
-    //                 throw new \Exception("Location '{$locationTitle}' not found.");
-    //             }
-
-    //             // Check if this zone-location combination already exists
-    //             $exists = ZoneWiseLocation::where('zone_id', $zone->id)
-    //                         ->where('location_id', $location->id)
-    //                         ->exists();
-
-    //             if ($exists) {
-    //                 // Skip this row if already exists
-    //                 continue;
-    //             }
-
-    //             $parsedDate = \DateTime::createFromFormat('d.m.y', $openingDate);
-    //             if (!$parsedDate) {
-    //                 throw new \Exception("Invalid date format at row: {$zoneName}, {$openingDate}");
-    //             }
-
-    //             ZoneWiseLocation::create([
-    //                 'zone_id'       => $zone->id,
-    //                 'location_id'   => $location->id,   // Match location by title
-    //                 'position'          => $size,
-    //                 'opening_date'  => $parsedDate->format('Y-m-d'),
-    //                 'status'        => 'active',
-    //             ]);
-    //         }
-
-    //         fclose($fileHandle);
-    //         return redirect()->back()->with('success', 'CSV imported successfully.');
-
-    //     } catch (\Exception $e) {
-    //         dd($e->getMessage());
-    //     }
-    // }
-
-//   public function import(Request $request)
-// {
-//     // $request->validate([
-//     //     'file' => 'required|mimetypes:text/plain,text/csv,application/csv,text/comma-separated-values,application/vnd.ms-excel',
-//     // ]);
-
-//     $errors = [];
-//     $inserted = 0;
-
-//     try {
-//         $file = $request->file('file');
-
-//         if (!$file || !$file->isValid()) {
-//             throw new \Exception('Invalid file upload.');
-//         }
-
-//         $path = $file->getRealPath();
-//         $fileHandle = fopen($path, 'r');
-
-//         $header = fgetcsv($fileHandle); // Skip header row
-
-//         while ($row = fgetcsv($fileHandle)) {
-//             if (count($row) < 4) {
-//                 $errors[] = "Invalid row format: " . implode(',', $row);
-//                 continue;
-//             }
-
-//             $zoneName      = trim($row[0]); 
-//             $locationTitle = trim($row[1]); 
-//             $openingDate   = trim($row[2]); 
-//             $size          = trim($row[3]); 
-
-//             try {
-//                 // Find Zone
-//                 $zone = Zone::where('name', $zoneName)->first();
-//                 if (!$zone) {
-//                     $errors[] = "Zone '{$zoneName}' not found.";
-//                     continue;
-//                 }
-
-//                 // Find or Create Location
-//                 $location = Location::where('title', $locationTitle)->first();
-
-//                 if (!$location) {
-//                     $lastId = Location::max('id') ?? 0;
-//                     $nextNumber = $lastId + 1;
-//                     $newLocationId = 'RUPA' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-
-//                     $location = Location::create([
-//                         'location_id' => $newLocationId,
-//                         'title'       => $locationTitle,
-//                         'position'       => $size,
-//                         'opening_date'       => $openingDate,
-//                         'status'      => 'active',
-//                     ]);
-//                 }
-
-//                 // Parse Date
-//                 $parsedDate = \DateTime::createFromFormat('d.m.y', $openingDate);
-//                 if (!$parsedDate) {
-//                     $errors[] = "Invalid date format: {$zoneName}, {$openingDate}";
-//                     continue;
-//                 }
-
-//                 // Always insert (no duplicate check)
-//                 ZoneWiseLocation::create([
-//                     'zone_id'       => $zone->id,
-//                     'location_id'   => $location->id,
-//                     'position'      => $size,
-//                     'opening_date'  => $parsedDate->format('Y-m-d'),
-//                     'status'        => 'active',
-//                 ]);
-
-//                 $inserted++;
-
-//             } catch (\Exception $ex) {
-//                 $errors[] = "Row failed: " . implode(',', $row) . " | Error: " . $ex->getMessage();
-//                 continue;
-//             }
-//         }
-
-//         fclose($fileHandle);
-
-//         return redirect()->back()->with([
-//             'success'  => "CSV imported successfully. Inserted: {$inserted}, Errors: " . count($errors),
-//             'errors'   => $errors
-//         ]);
-
-//     } catch (\Exception $e) {
-//         return redirect()->back()->with('error', $e->getMessage());
-//     }
-// }
+   
 
 public function import(Request $request)
 {
-    // $request->validate([
-    //     'file' => 'required|mimetypes:text/plain,text/csv,application/csv,text/comma-separated-values,application/vnd.ms-excel',
-    // ]);
-
+ 
     $errors = [];
     $inserted = 0;
 
@@ -409,11 +243,8 @@ public function import(Request $request)
         $getLocations = Location::all();
          $locations = ZoneWiseLocation::with('location_details')->latest()->get();
          
-         $editLocation = null;
-         if($request->has('edit')){
-            $editLocation = ZoneWiseLocation::findOrFail($request->edit);
-         }
-        return view('admin.zone.location.index',compact('getZones','getLocations','locations','editLocation'));
+        
+        return view('admin.zone.location.index',compact('getZones','getLocations','locations'));
     }
 
     public function zoneWiseLocationStore(Request $request){
@@ -432,30 +263,95 @@ public function import(Request $request)
          return redirect()->back()->with('success', 'Zone Location created successfully.');
     }
 
-    public function zoneWiseLocationUpdate(Request $request,$id){
-       $validated = $request->validate([
-            'zone_id'       => 'required|exists:zones,id',
-            'location_id' => 'required|string|max:255',
-       ]);
+    public function zoneWiseLocationEdit($id){
+        $location = ZoneWiseLocation::with('location_details')->findOrFail($id);
+        return response()->json([
+             'id' => $location->id,
+            'zone_id' => $location->zone_id,
+            'location_id' => $location->location_id,
+            'location_name' => $location->location_details->title, 
+            'position' => $location->position,
+            'opening_date' => $location->opening_date,
+            'status' => $location->status,
+        ]);
+    }
 
-        // Check if this zone-location combination already exists
+    // public function zoneWiseLocationUpdate(Request $request,$id){
+    //    $validated = $request->validate([
+    //         'zone_id'       => 'required|exists:zones,id',
+    //         'location_id' => 'required|string|max:255',
+    //    ]);
+
+    //     // Check if this zone-location combination already exists
+    //     $exists = ZoneWiseLocation::where('zone_id', $validated['zone_id'])
+    //                 ->where('location_id', $validated['location_id'])
+    //                 ->where('id', '!=', $id)
+    //                 ->exists();
+
+    //     if($exists){
+    //         return redirect()->back()
+    //                 ->with('error','This Zone and Location combination already exists.')
+    //                 ->withInput(['zone_id' => '', 'location_id' => '']);
+    //     }
+
+    //    $location = ZoneWiseLocation::findOrFail($id);
+    //    $location->update($request->all());
+
+    //     return redirect()->route('zone.location.index')->with('success', 'Zone Location updated successfully.');
+
+    // }
+
+     public function zoneWiseLocationUpdate(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'zone_id'     => 'required|exists:zones,id',
+            'location_id' => 'required|string|max:255', // this is the title/name of the location
+            'position'    => 'nullable|string|max:255', // optional: size/position
+            'opening_date'=> 'nullable|date_format:d.m.y' // optional
+        ]);
+
+        $locationEntry = ZoneWiseLocation::findOrFail($id);
+
+        // Check for duplicates
         $exists = ZoneWiseLocation::where('zone_id', $validated['zone_id'])
-                    ->where('location_id', $validated['location_id'])
-                    ->where('id', '!=', $id)
-                    ->exists();
+            ->where('location_id', $locationEntry->location_id) // use location_id from ZoneWiseLocation
+            ->where('id', '!=', $id)
+            ->exists();
 
-        if($exists){
-            return redirect()->back()
-                    ->with('error','This Zone and Location combination already exists.')
-                    ->withInput(['zone_id' => '', 'location_id' => '']);
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This Zone and Location combination already exists.'
+            ], 422);
         }
 
-       $location = ZoneWiseLocation::findOrFail($id);
-       $location->update($request->all());
+        // Update Location table
+        $location = Location::find($locationEntry->location_id);
+        if ($location) {
+            $location->update([
+                'title'        => $validated['location_id'], // update title
+                'position'     => $validated['position'] ?? $location->position,
+                'opening_date' => isset($validated['opening_date'])
+                                    ? \DateTime::createFromFormat('d.m.y', $validated['opening_date'])->format('Y-m-d')
+                                    : $location->opening_date,
+            ]);
+        }
 
-        return redirect()->route('zone.location.index')->with('success', 'Zone Location updated successfully.');
+        // Update ZoneWiseLocation table
+        $locationEntry->update([
+            'zone_id'      => $validated['zone_id'],
+            'position'     => $validated['position'] ?? $locationEntry->position,
+            'opening_date' => isset($validated['opening_date'])
+                                ? \DateTime::createFromFormat('d.m.y', $validated['opening_date'])->format('Y-m-d')
+                                : $locationEntry->opening_date,
+        ]);
 
+        return response()->json([
+            'success' => true,
+            'message' => 'Zone Location and associated Location updated successfully.'
+        ]);
     }
+
 
     public function zoneWiseLocationStatus(Request $request,$id){
         $location = ZoneWiseLocation::findOrFail($id);
@@ -572,20 +468,91 @@ public function import(Request $request)
     public function zoneWiseEmployeeEdit($id)
     {
         $employee = User::with(['zones', 'locations'])->findOrFail($id);
-         $zoneIds     = $employee->zones->pluck('id')->toArray();   // All zone IDs
-    $locationIds = $employee->locations->pluck('id')->toArray(); 
+         $zoneIds     = $employee->zones->pluck('id')->toArray();  
 
         return response()->json([
             'id'            => $employee->id,
             'name'          => $employee->name,
             'email'         => $employee->email,
             'mobile'        => $employee->mobile,
+            'alternate_mobile'   => $employee->alternate_number,
             'role'          => $employee->role,
             'supervisor_id' => $employee->supervisor_id,
             'zone_id'       => $zoneIds,
-            'location_id'   => $locationIds,
         ]);
     }
+
+    public function zoneWiseEmployeeUpdate(Request $request,$id){
+        $validated = $request->validate([
+            'edit_name'              => 'required|string|max:255',
+            'edit_email'             => 'required|email|unique:users,email,' . $id,
+            'edit_phone'             => 'required|digits:10',
+            'edit_alternate_number'  => 'nullable|digits:10',
+            'edit_role'              => 'required|in:supervisor,employee,complaint',
+            'edit_supervisor_id' => [
+                            Rule::requiredIf($request->edit_role === 'employee'),
+                            'nullable',
+                            'exists:users,id',
+                        ],
+           'edit_zone_id'   => 'required|array',
+           'edit_zone_id.*' => 'required|exists:zones,id',
+        ]);
+
+        try{
+             // Find employee
+            $employee = User::findOrFail($id);
+            // Update basic fields
+            $employee->name = $validated['edit_name'];
+            $employee->email            = $validated['edit_email'];
+            $employee->mobile           = $validated['edit_phone'];
+            $employee->alternate_number = $validated['edit_alternate_number'];
+            $employee->role             = $validated['edit_role'];
+            $employee->supervisor_id    = $validated['edit_supervisor_id'];
+            $employee->save();
+
+             // Update zone assignments (pivot table)
+            if ($request->has('edit_zone_id')) {
+                $employee->zones()->sync($validated['edit_zone_id']); 
+            }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee updated successfully.',
+        ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Update failed: ' . $e->getMessage(),
+            ], 500);
+        }
+
+
+
+    }
+
+    public function zoneWiseEmployeeDelete($id){
+        try {
+            $employee = User::findOrFail($id);
+
+            // Delete associated employee zone assignments
+            EmployeeZoneAssignment::where('employee_id', $id)->delete();
+
+            // Delete employee
+            $employee->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Employee and all their zone assignments have been deleted.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete employee.'
+            ], 500);
+        }
+    }
+
 
     public function zoneWiseEmployeeStatus(Request $request, $id)
     {

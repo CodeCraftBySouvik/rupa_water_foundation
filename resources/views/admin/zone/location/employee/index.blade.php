@@ -88,17 +88,17 @@
                                             Actions
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="actionsDropdown{{ $data->id }}">
-                                            <li><a class="dropdown-item" href="#"
+                                            {{-- <li><a class="dropdown-item" href="#"
                                                     onclick="transferEmployee({{ $data->id }})" data-bs-toggle="modal"
-                                                    data-bs-target="#transferModal{{ $data->id }}">Transfer</a></li>
+                                                    data-bs-target="#transferModal{{ $data->id }}">Transfer</a></li> --}}
                                             <li>
                                                 <a class="dropdown-item" href="#"
                                                     onclick="editEmployee({{ $data->id }})" data-bs-toggle="modal"
                                                     data-bs-target="#editEmployeeModal">Edit</a>
                                             </li>
 
-                                            <li><a class="dropdown-item text-danger" href="#"
-                                                    onclick="deleteEmployee({{ $data->id }})">Delete</a></li>
+                                            {{-- <li><a class="dropdown-item text-danger" href="#"
+                                                    onclick="deleteEmployee({{ $data->id }})">Delete</a></li> --}}
                                         </ul>
                                     </div>
                                     {{-- Show complaint button only if user has complaints --}}
@@ -329,7 +329,6 @@
                                 <label for="employee_zone" class="form-label">Zone *</label>
                                 <select class="form-select" name="zone_id[]" id="employee_zone" multiple
                                     style="width: 100%;">
-                                    <option value="" selected hidden>Select zone</option>
                                     @foreach($zones as $zone)
                                     <option value="{{ $zone->id }}">{{ $zone->name }}</option>
                                     @endforeach
@@ -377,7 +376,7 @@
                                 <label for="edit_employee_email" class="form-label">Email *</label>
                                 <input type="email" class="form-control" name="edit_email" id="edit_employee_email"
                                     placeholder="Enter email">
-                                <div class="text-danger small" id="edit_employee_email"></div>
+                                <div class="text-danger small" id="edit_employee_email_error"></div>
                             </div>
                             <input type="text" name="fakeusernameremembered" style="display:none;">
                             <input type="password" name="fakepasswordremembered" style="display:none;">
@@ -385,17 +384,18 @@
                             <!-- Phone -->
                             <div class="col-md-6">
                                 <label for="edit_employee_phone" class="form-label">Phone</label>
-                                <input type="text" class="form-control" name="edit_phone" placeholder="Enter phone number"
-                                    autocomplete="off">
-                                <div class="text-danger small" id="edit_employee_phone"></div>
+                                <input type="text" class="form-control" id="edit_employee_phone" name="edit_phone"
+                                    placeholder="Enter phone number" autocomplete="off">
+                                <div class="text-danger small" id="edit_employee_phone_error"></div>
                             </div>
 
                             <!--Alternate Phone -->
                             <div class="col-md-6">
                                 <label for="edit_employee_alternate_number" class="form-label">Alternate Number</label>
-                                <input type="text" class="form-control" name="edit_alternate_number"
-                                    placeholder="Enter Alternate number" autocomplete="off">
-                                <div class="text-danger small" id="edit_employee_alternate_number"></div>
+                                <input type="text" class="form-control" id="edit_employee_alternate_number"
+                                    name="edit_alternate_number" placeholder="Enter Alternate number"
+                                    autocomplete="off">
+                                <div class="text-danger small" id="edit_employee_alternate_number_error"></div>
                             </div>
 
 
@@ -432,7 +432,6 @@
                                 <label for="edit_employee_zone" class="form-label">Zone *</label>
                                 <select class="form-select" name="edit_zone_id[]" id="edit_employee_zone" multiple
                                     style="width: 100%;">
-                                    <option value="" selected hidden>Select zone</option>
                                     @foreach($zones as $zone)
                                     <option value="{{ $zone->id }}">{{ $zone->name }}</option>
                                     @endforeach
@@ -456,13 +455,68 @@
 @section('scripts')
 <script>
     $('#employee_zone').select2({
+         placeholder: "Select Zone",
         allowClear: true,
         dropdownParent: $('#addEmployeeModal')
     });
     $('#edit_employee_zone').select2({
+         placeholder: "Select Zone",
         allowClear: true,
         dropdownParent: $('#editEmployeeModal')
     });
+
+    // Delete employee with confirmation
+    function deleteEmployee(employeeId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This will permanently delete the employee and all their zone assignments!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let url = "{{ route('zone.employee.delete', ':id') }}".replace(':id', employeeId);
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Remove employee row from table
+                            $('#employee_' + employeeId).remove();
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'An unexpected error occurred. Please try again.'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
 
      // Function to fetch employee data and populate edit form
     function editEmployee(id) {
@@ -472,6 +526,7 @@
             url: url,
             type: "GET",
             success: function(response) {
+                console.log(response);
                 if (response) {
                     let employee = response;
                     // Fill modal fields
@@ -479,7 +534,7 @@
                     $('#edit_employee_name').val(employee.name);
                     $('#edit_employee_email').val(employee.email);
                     $('#edit_employee_phone').val(employee.mobile);
-                    $('#edit_employee_alternate_number').val(employee.alternate_number);
+                    $('#edit_employee_alternate_number').val(employee.alternate_mobile);
                     $('#edit_employee_role').val(employee.role);
                     $('#edit_employee_supervisor').val(employee.supervisor_id);
                     
@@ -501,10 +556,7 @@
         });
     }
 
-       $('#edit_employee_zone').select2({
-       allowClear: true,
-       dropdownParent: $('#editEmployeeModal')
-   });
+       
 
    // Edit form submission
    $('#editEmployeeForm').submit(function(e) {
@@ -514,7 +566,7 @@
 
        let employeeId = $('#edit_employee_id').val();
        let url = "{{ route('zone.employee.update', ':id') }}".replace(':id', employeeId);
-       let formData = $(this).serialize() + '&_method=PUT';
+       let formData = $(this).serialize();
 
        $.ajax({
            url: url,
@@ -537,10 +589,21 @@
            error: function(xhr) {
                if (xhr.status === 422) {
                    let errors = xhr.responseJSON.errors;
-                   $.each(errors, function(key, messages) {
-                       let errorFieldId = '#edit_employee_' + key + '_error';
-                       $(errorFieldId).text(messages[0]);
-                   });
+                    let fieldMap = {
+                    edit_name: 'edit_employee_name_error',
+                    edit_email: 'edit_employee_email_error',
+                    edit_phone: 'edit_employee_phone_error',
+                    edit_alternate_number: 'edit_employee_alternate_number_error',
+                    edit_role: 'edit_employee_role_error',
+                    edit_supervisor_id: 'edit_employee_supervisor_error',
+                    edit_zone_id: 'edit_employee_zone_error'
+                };
+
+                $.each(errors, function(key, messages) {
+                    if (fieldMap[key]) {
+                        $('#' + fieldMap[key]).text(messages[0]);
+                    }
+                });
                } else {
                    Swal.fire({
                        icon: 'error',

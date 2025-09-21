@@ -1,7 +1,6 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-{{-- @include('layouts.navbars.auth.topnav', ['title' => 'Zone Wise Location Management']) --}}
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
@@ -68,142 +67,7 @@
                 </div>
 
 
-                {{-- <div class="card-body px-0 pt-0 pb-2">
-                    <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
-                            <thead>
-                                <tr class="text-center">
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Sl.No</th>
-                                    <th
-                                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Zone</th>
-                                    <th
-                                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Location</th>
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Status</th>
 
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="locationsTableBody">
-                                @forelse($locations as $index=> $data)
-                                <tr class="text-center" id="location-row-{{ $data->id }}">
-                                    <td>
-                                        <div class="">
-                                            <h6 class="mb-0 text-sm">{{$index + 1}}</h6>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <p class="text-xs font-weight-bold mb-0">{{ucwords($data->zone_name ?
-                                            $data->zone_name->name : '')}}</p>
-                                    </td>
-                                    <td class="align-middle text-center text-sm">
-                                        <span class="badge badge-sm bg-gradient-success">{{$data->location_details ?
-                                            $data->location_details->title : '-'}}</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="form-check form-switch d-flex justify-content-center">
-                                            <input type="checkbox" class="form-check-input"
-                                                id="statusSwitch{{ $data->id }}" {{ $data->status === 'Active' ?
-                                            'checked' : '' }}
-                                            onchange="toggleLocationStatus({{ $data->id }},this.checked)">
-                                        </div>
-                                    </td>
-
-                                    <td class="align-middle">
-                                        <a href="{{route('zone.location.index',['edit' => $data->id])}}" class=" "
-                                            style="margin-right: 8px;">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                        <a href="javascript:void(0);" onclick="deleteLocation({{$data->id}})">
-                                            <i class="fa fa-trash text-danger"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="5" class="text-center py-4">
-                                        No Zone Location Found
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                        <div class="mt-3">
-                            {{ $locations->links() }}
-                        </div>
-                    </div>
-                </div> --}}
-                {{-- <div class="card-body px-0 pt-0 pb-2">
-                    <div class="table-responsive p-0">
-                        @forelse($locations->groupBy(function($data) {
-                        return $data->zone_name ? $data->zone_name->name : 'Unknown Zone';
-                        }) as $zoneName => $zoneLocations)
-                        <h5 class="text-primary mt-4 ms-4">{{ $zoneName }}</h5>
-                        <table class="table align-items-center mb-0">
-                            <thead>
-                                <tr class="text-center">
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Sl.No</th>
-                                    <th
-                                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Location</th>
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Status</th>
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($zoneLocations as $index => $data)
-                                <tr class="text-center" id="location-row-{{ $data->id }}">
-                                    <td>
-                                        <div class="">
-                                            <h6 class="mb-0 text-sm">{{ $index + 1 }}</h6>
-                                        </div>
-                                    </td>
-                                    <td class="align-middle text-center text-sm">
-                                        <span class="badge badge-sm bg-gradient-success">
-                                            {{ $data->location_details ? $data->location_details->title : '-' }}
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="form-check form-switch d-flex justify-content-center">
-                                            <input type="checkbox" class="form-check-input"
-                                                id="statusSwitch{{ $data->id }}" {{ $data->status === 'Active' ?
-                                            'checked' : '' }}
-                                            onchange="toggleLocationStatus({{ $data->id }},this.checked)">
-                                        </div>
-                                    </td>
-                                    <td class="align-middle">
-                                        <a href="{{ route('zone.location.index', ['edit' => $data->id]) }}" class=" "
-                                            style="margin-right: 8px;">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                        <a href="javascript:void(0);" onclick="deleteLocation({{ $data->id }})">
-                                            <i class="fa fa-trash text-danger"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        @empty
-                        <div class="text-center py-4">No Zone Location Found</div>
-                        @endforelse
-
-                        <div class="mt-3">
-                            {{ $locations->links() }}
-                        </div>
-                    </div>
-                </div> --}}
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
                         @php
@@ -276,8 +140,9 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <a href="{{ route('zone.location.index', ['edit' => $data->id]) }}"
-                                                    style="margin-right: 8px;">
+                                                <a href="javascript:void(0);"
+                                                    onclick="editZoneLocation({{ $data->id }})" data-bs-toggle="modal"
+                                                    data-bs-target="#editZoneLocationModal" style="margin-right: 8px;">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
                                                 <a href="javascript:void(0);" onclick="deleteLocation({{ $data->id }})">
@@ -297,71 +162,125 @@
 
             </div>
         </div>
-        {{-- --}}
-
-        {{-- <div class="col-md-4">
-            <form method="POST"
-                action="{{ isset($editLocation) ? route('zone.location.update', $editLocation->id) : route('zone.location.store') }}">
-                @csrf
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-uppercase text-sm">{{isset($editLocation) ? 'Edit' : 'Create'}} Zone Wise
-                            Location</p>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="example-text-input" class="form-control-label">Zone</label>
-                                    <select name="zone_id" id="zone_id" class="form-control">
-                                        <option value="" selected hidden>-- Select Zone --</option>
-                                        @foreach ($getZones as $zone)
-                                        <option value="{{ $zone->id }}" {{(isset($editLocation) && $editLocation->
-                                            zone_id == $zone->id) ? 'selected' : ''}}>
-                                            {{ $zone->name }}
-                                        </option>
+        {{--Edit Location Modal --}}
+        <div class="modal fade" id="editZoneLocationModal" tabindex="-1" aria-labelledby="editZoneLocationModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <form id="editZoneLocationForm">
+                    @csrf
+                    <input type="hidden" name="edit_location_id" id="edit_location_id">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Zone Location</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body py-4">
+                            <div class="row g-3">
+                                <!-- Zone -->
+                                <div class="col-12">
+                                    <label for="edit_zone_id" class="form-label">Zone *</label>
+                                    <select class="form-select" name="zone_id" id="edit_zone_id" required>
+                                        <option value="" selected hidden>Select Zone</option>
+                                        @foreach($getZones as $zone)
+                                        <option value="{{ $zone->id }}">{{ $zone->name }}</option>
                                         @endforeach
                                     </select>
-                                    @error('zone_id')
-                                    <p class="text-danger small">{{$message}}</p>
-                                    @enderror
+                                    <div class="text-danger small" id="edit_zone_id_error"></div>
                                 </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="location_id" class="form-control-label">Location</label>
-                                    <select class="form-control select2-single" name="location_id" id="location_id">
-                                        <option value="" selected hidden>Select Location</option>
-                                        @foreach($getLocations as $location)
-                                        <option value="{{ $location->id }}" {{ old('location_id', $editLocation->
-                                            location_id ?? '') == $location->id ? 'selected' : '' }}>
-                                            {{ $location->title }}
-                                        </option>
-                                        @endforeach
-                                    </select>
-
-                                    @error('location_id')
-                                    <p class="text-danger small">{{ $message }}</p>
-                                    @enderror
+                                <!-- Location -->
+                                <div class="col-12">
+                                    <label for="edit_location_name" class="form-label">Location *</label>
+                                    <input type="text" class="form-control" name="location_id" id="edit_location_name"
+                                        placeholder="Enter location" required>
+                                    <div class="text-danger small" id="edit_location_id_error"></div>
                                 </div>
-                            </div>
-
-
-
-                            <div class="col-md-2">
-                                <button type="submit" class="btn btn-primary btn-sm">{{isset($editLocation) ? 'Update' :
-                                    'Create'}}</button>
                             </div>
                         </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                        </div>
                     </div>
-                </div>
-            </form>
-        </div> --}}
+                </form>
+            </div>
+        </div>
+
 
     </div>
-    {{-- @include('layouts.footers.auth.footer') --}}
 </div>
 @endsection
 @section('scripts')
 <script>
+        function editZoneLocation(id) {
+        let url = "{{ route('zone.location.edit', ':id') }}".replace(':id', id);
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(response) {
+                console.log(response);
+                if(response) {
+                    $('#edit_location_id').val(response.id);
+                    $('#edit_zone_id').val(response.zone_id);
+                    $('#edit_location_name').val(response.location_name);
+                    $('#editZoneLocationModal').modal('show');
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Failed to fetch data!'
+                });
+            }
+        });
+    }
+
+    $('#editZoneLocationForm').submit(function(e) {
+    e.preventDefault();
+    $('.text-danger.small').text('');
+
+    let id = $('#edit_location_id').val();
+    let url = "{{ route('zone.location.update', ':id') }}".replace(':id', id);
+    let data = $(this).serialize();
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: data,
+        success: function(response) {
+            if(response.success) {
+                $('#editZoneLocationModal').modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Updated!',
+                    text: response.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload(); // Or update the row dynamically
+                });
+            }
+        },
+        error: function(xhr) {
+            if(xhr.status === 422) {
+                let errors = xhr.responseJSON.errors;
+                if(errors.zone_id) $('#edit_zone_id_error').text(errors.zone_id[0]);
+                if(errors.location_id) $('#edit_location_id_error').text(errors.location_id[0]);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An unexpected error occurred.'
+                });
+            }
+        }
+    });
+});
+
+
+
     $(document).ready(function() {
         $('#location_id').select2({
             placeholder: "Select Location",

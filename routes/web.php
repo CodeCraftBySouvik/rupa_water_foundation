@@ -95,6 +95,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/location/sample-csv', [ZoneController::class, 'downloadSampleCsv'])->name('location.sample');
 		Route::post('/location/import', [ZoneController::class, 'import'])->name('location.import');
 		Route::post('/location/create', [ZoneController::class, 'zoneWiseLocationStore'])->name('location.store');
+		Route::get('/location/edit/{id}', [ZoneController::class, 'zoneWiseLocationEdit'])->name('location.edit');
 		Route::post('/location/update/{id}', [ZoneController::class, 'zoneWiseLocationUpdate'])->name('location.update');
 		Route::post('/location/toggle-status/{id}', [ZoneController::class, 'zoneWiseLocationStatus'])->name('location.status');
 		Route::post('/location/delete/{id}', [ZoneController::class, 'zoneWiseLocationDelete'])->name('location.delete');
@@ -103,6 +104,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/employee', [ZoneController::class, 'zoneWiseEmployeeIndex'])->name('employee.index');
 		Route::post('/employee/store', [ZoneController::class, 'zoneWiseEmployeeStore'])->name('employee.store');
 		Route::get('/employee/edit/{id}', [ZoneController::class, 'zoneWiseEmployeeEdit'])->name('employee.edit');
+		Route::post('/employee/update/{id}', [ZoneController::class, 'zoneWiseEmployeeUpdate'])->name('employee.update');
+		Route::post('/employee/delete/{id}', [ZoneController::class, 'zoneWiseEmployeeDelete'])->name('employee.delete');
 		Route::post('/employee/toggle-status/{id}', [ZoneController::class, 'zoneWiseEmployeeStatus'])->name('employee.status');
 	
 
