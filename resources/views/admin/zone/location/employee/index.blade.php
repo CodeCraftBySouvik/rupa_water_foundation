@@ -2,7 +2,6 @@
 
 @section('content')
 
-{{-- @include('layouts.navbars.auth.topnav', ['title' => 'Zones']) --}}
 
 <div class="container-fluid py-4">
     <div id="alert">
@@ -641,6 +640,9 @@
                         text: response.message,
                         timer: 2000,
                         showConfirmButton: false
+                    }).then(() => {
+                        // reload page after alert
+                        location.reload();
                     });
 
                     // Update employee list dynamically (assuming you have a div or table with id #employeeList)
@@ -673,8 +675,7 @@
                 `;
 
                 // Prepend new employee row
-                $('#employeeList').append(newEmployeeHtml);
-                location.reload();
+                 $('#employeeList').append(newEmployeeHtml);
                 }
             },
             error: function(xhr) {

@@ -1,11 +1,8 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-{{-- @include('layouts.navbars.auth.topnav', ['title' => 'Create Inspection']) --}}
 
 <div class="container-fluid py-4">
-
-    {{-- @isset($inspection) @method('PUT') @endisset --}}
 
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -118,10 +115,10 @@
                             {{-- Tap & glass condition --------------------------------------------- --}}
                             <div class="mb-3">
                                 <label class="form-label small text-muted">Tap condition</label><br>
-                                {!! pill('tap_glass_condition','present','Present',old('tap_glass_condition')) !!}
-                                {!! pill('tap_glass_condition','not
-                                present','Not&nbsp;Present',old('tap_glass_condition')) !!}
-                                @error('tap_glass_condition')
+                                {!! pill('tap_condition','present','Present',old('tap_condition')) !!}
+                                {!! pill('tap_condition','not
+                                present','Not&nbsp;Present',old('tap_condition')) !!}
+                                @error('tap_condition')
                                 <p class="text-danger small">{{$message}}</p>
                                 @enderror
                             </div>

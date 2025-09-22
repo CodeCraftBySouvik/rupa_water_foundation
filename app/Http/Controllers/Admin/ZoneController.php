@@ -25,7 +25,7 @@ class ZoneController extends Controller
 
     public function store(Request $request){
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|unique:zones,name|string|max:255',
             'description' => 'nullable|string',
         ]);
 
@@ -33,7 +33,8 @@ class ZoneController extends Controller
             'name' => $request->name,
             'description' => $request->description,
         ]);
-
+        // reload zone with counts
+        $zone = Zone::with('zoneLocations','zoneEmployees')->find($zone->id);
         return response()->json($zone);
     }
 
@@ -276,30 +277,7 @@ public function import(Request $request)
         ]);
     }
 
-    // public function zoneWiseLocationUpdate(Request $request,$id){
-    //    $validated = $request->validate([
-    //         'zone_id'       => 'required|exists:zones,id',
-    //         'location_id' => 'required|string|max:255',
-    //    ]);
-
-    //     // Check if this zone-location combination already exists
-    //     $exists = ZoneWiseLocation::where('zone_id', $validated['zone_id'])
-    //                 ->where('location_id', $validated['location_id'])
-    //                 ->where('id', '!=', $id)
-    //                 ->exists();
-
-    //     if($exists){
-    //         return redirect()->back()
-    //                 ->with('error','This Zone and Location combination already exists.')
-    //                 ->withInput(['zone_id' => '', 'location_id' => '']);
-    //     }
-
-    //    $location = ZoneWiseLocation::findOrFail($id);
-    //    $location->update($request->all());
-
-    //     return redirect()->route('zone.location.index')->with('success', 'Zone Location updated successfully.');
-
-    // }
+   
 
      public function zoneWiseLocationUpdate(Request $request, $id)
     {

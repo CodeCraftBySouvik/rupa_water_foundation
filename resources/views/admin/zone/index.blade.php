@@ -2,7 +2,6 @@
 
 @section('content')
 
-{{-- @include('layouts.navbars.auth.topnav', ['title' => 'Zones']) --}}
 
 <div class="container-fluid py-4">
     <div id="alert">
@@ -35,7 +34,7 @@
                             <div class="text-danger small" id="zone_name_error"></div>
                         </div>
 
-                     
+
                     </div>
 
                     <div class="modal-footer">
@@ -67,9 +66,9 @@
                         </div>
 
                     </div>
-                 
+
                     <div class="d-flex justify-content-between mt-3">
-                        
+
                         <div>
                             <h4 class="text-primary">{{$zone->zone_locations_count}}</h4>
                             <small>Locations</small>
@@ -125,7 +124,7 @@
                                 <div class="text-danger small" id="edit_zone_name_error"></div>
                             </div>
 
-                            
+
                         </div>
 
                         <div class="modal-footer">
@@ -181,14 +180,14 @@
     </div>
 
 
-   
+
 
 </div>
 @endsection
 
 @section('scripts')
 <script>
-      function viewEmployees(zoneId) {
+    function viewEmployees(zoneId) {
         let url = "{{ route('zone.getLocations', ':id') }}".replace(':id', zoneId);
 
         $.ajax({
@@ -310,11 +309,6 @@
 
                 $('#zone-card-' + response.zone.id).html(updatedZoneHtml);
                 $('#zone-location-count-' + response.zone.id).text(response.location_count);
-
-               
-
-                // // Open the modal
-                // $('#viewLocationsModal').modal('show');
             },
             error: function(xhr) {
                 let errors = xhr.responseJSON.errors;
@@ -387,7 +381,6 @@
                 method: "POST",
                 data: $(this).serialize(),
                 success: function (response) {
-                    console.log(response);
                      Swal.fire({
                         icon: 'success',
                         title: 'Zone added successfully!',
@@ -399,10 +392,9 @@
                     $('#addZoneForm')[0].reset();
                     $('#addZoneModal').modal('hide');
 
-                    // Remove the "No Zones Found" message if it exists
                     $('#zonesList .no-zones-message').remove();
                      let newZoneHtml = `
-                            <div class="col-md-6 mb-4" id="zone-card-${response.id}">
+                            <div class="col-md-4 mb-4" id="zone-card-${response.id}">
                                 <div class="card shadow-sm">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-center">
@@ -414,19 +406,18 @@
                                                 </a>
                                             </div>
                                         </div>
-                                      
-                                        <p class="d-flex justify-content-between mb-0">
-                                            <strong><i class="ni ni-single-02 text-dark text-sm opacity-10"></i> Supervisor:</strong>
-                                            <span><strong>Michael Chen</strong></span>
-                                        </p>
                                         <div class="d-flex justify-content-between mt-3">
-                                            <div><h4 class="text-primary">312</h4><small>Employees</small></div>
-                                            <div><h4 class="text-primary">${response.location_count}</h4><small>Locations</small></div>
+                                            <div><h4 class="text-primary">${response.zone_employees_count ?? 0}</h4><small>Employees</small></div>
+                                            <div><h4 class="text-primary">${response.zone_locations_count ?? 0}</h4><small>Locations</small></div>
                                         </div>
 
                                         <div class="mt-3 d-flex justify-content-between">
-                                            <a href="#" class="btn btn-outline-secondary btn-sm"><i class="fas fa-map-marker-alt"></i> View Locations</a>
-                                            <a href="#" class="btn btn-outline-secondary btn-sm"><i class="fas fa-users"></i> View Employees</a>
+                                            <a href="javascript:void(0);" class="btn btn-outline-secondary btn-sm" onclick="viewLocations(${response.id})">
+                                                <i class="fas fa-map-marker-alt"></i> View Locations
+                                            </a>
+                                            <a href="javascript:void(0);" class="btn btn-outline-secondary btn-sm" onclick="viewEmployees(${response.id})">
+                                                <i class="fas fa-users"></i> View Employees
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -434,7 +425,7 @@
                         `;
 
                         $('#zonesList').append(newZoneHtml);
-
+                         
                 }, 
                 error: function (xhr) {
                     let errors = xhr.responseJSON.errors;

@@ -68,7 +68,7 @@ class LocationController extends Controller
                 'electric_available' => $inspection->electric_available,
                 'cooling_system' => $inspection->cooling_system,
                 'cleanliness' => $inspection->cleanliness,
-                'tap_condition' => $inspection->tap_glass_condition,
+                'tap_condition' => $inspection->tap_condition,
                 'electric_meter_working' => $inspection->electric_meter_working,
                 'compressor_condition' => $inspection->compressor_condition,
                 'light_availability' => $inspection->light_availability,

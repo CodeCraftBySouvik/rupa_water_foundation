@@ -56,7 +56,7 @@ class InspectionController extends Controller
         'electric_available'     => 'required|in:yes,no',
         'cooling_system'         => 'required|in:working,not working',
         'cleanliness'            => 'required|in:clean,dirty',
-        'tap_glass_condition'    => 'required|in:present,not present',
+        'tap_condition'    => 'required|in:present,not present',
         'electric_meter_working' => 'required|in:yes,no',
         'compressor_condition'   => 'required|in:ok,not ok',
         'light_availability'     => 'required|in:yes,no',

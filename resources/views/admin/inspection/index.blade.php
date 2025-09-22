@@ -1,7 +1,6 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-{{-- @include('layouts.navbars.auth.topnav', ['title' => 'Inspection History']) --}}
 
 <div class="container-fluid py-4">
 
@@ -23,14 +22,7 @@
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                 Location</th>
-                            {{-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                Water Quality</th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                Electric</th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Cooling
-                            </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                Cleanliness</th> --}}
+                            
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                 Report</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
@@ -73,39 +65,6 @@
                                 </button>
                             </td>
 
-
-                            {{-- water quality badge --}}
-                            {{-- <td>
-                                <span
-                                    class="badge badge-sm {{ $in->water_quality == 'good' ? 'bg-gradient-success' : 'bg-gradient-danger' }}">
-                                    {{ ucfirst($in->water_quality) }}
-                                </span>
-                            </td> --}}
-
-                            {{-- electric available --}}
-                            {{-- <td>
-                                <span
-                                    class="badge badge-sm {{ $in->electric_available == 'yes' ? 'bg-gradient-success' : 'bg-gradient-danger' }}">
-                                    {{ ucfirst($in->electric_available) }}
-                                </span>
-                            </td> --}}
-
-                            {{-- cooling system --}}
-                            {{-- <td>
-                                <span
-                                    class="badge badge-sm {{ $in->cooling_system == 'working' ? 'bg-gradient-success' : 'bg-gradient-warning' }}">
-                                    {{ ucfirst($in->cooling_system) }}
-                                </span>
-                            </td> --}}
-
-                            {{-- cleanliness --}}
-                            {{-- <td>
-                                <span
-                                    class="badge badge-sm {{ $in->cleanliness == 'clean' ? 'bg-gradient-success' : 'bg-gradient-danger' }}">
-                                    {{ ucfirst($in->cleanliness) }}
-                                </span>
-                            </td> --}}
-
                             {{-- checker --}}
                             <td class="text-center">
                                 <p class="text-xs mb-0">{{ $in->checker->name ?? '—' }}</p>
@@ -115,11 +74,7 @@
                             <td class="text-end">
                                 <a href="{{route('inspection.edit',$in->id)}}" class="btn btn-dark btn-sm mt-1">Edit</a>
 
-                                {{-- <form method="POST" action="" class="d-inline"
-                                    onsubmit="return confirm('Delete this inspection?')">
-                                    @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-danger">Del</button>
-                                </form> --}}
+                               
                                 <a href="{{ route('inspection.galleries.list', ['inspection_id' => $in->id]) }}"
                                     class="btn btn-info btn-sm mt-1">
                                     Gallery</a>
@@ -214,14 +169,7 @@
                                 <th>Notes</th>
                                 <td id="report-notes"></td>
                             </tr>
-                            {{-- <tr>
-                                <th>Created At</th>
-                                <td id="report-created"></td>
-                            </tr>
-                            <tr>
-                                <th>Updated At</th>
-                                <td id="report-updated"></td>
-                            </tr> --}}
+                          
                         </tbody>
                     </table>
                 </div>
