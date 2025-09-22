@@ -16,7 +16,7 @@
                     href="{{ route('zone.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                       <i class="ni ni-tv-2 text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Dashboard</span>
                 </a>
@@ -81,7 +81,7 @@
                     href="{{ route('zone.location.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-pin-3 text-dark text-sm opacity-10"></i>   <!-- Nucleo location pin -->
                     </div>
                     <span class="nav-link-text ms-1">Zone Wise Location</span>
                 </a>
