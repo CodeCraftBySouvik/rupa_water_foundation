@@ -21,7 +21,7 @@
                 <table class="table align-items-center">
                     <thead>
                         <tr class="text-center">
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sl.No</th>
+                            {{-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sl.No</th> --}}
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Name
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Mobile
@@ -45,12 +45,24 @@
                         {{-- Dynamic employee rows will be prepended here --}}
                         @forelse($userlist as $key=> $data)
                         <tr class="text-center">
+                            {{-- <td> --}}
+                                {{-- <h6 class="mb-0 text-sm">{{$key + 1}}</h6> --}}
+                            {{-- </td> --}}
+                            @php
+                                $words = explode(' ', $data->name);
+                                $initials = strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr(end($words), 0,
+                                1) : ''));
+                            @endphp
                             <td>
-                                <h6 class="mb-0 text-sm">{{$key + 1}}</h6>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-2"
+                                        style="width:35px; height:35px; font-size:14px; font-weight:bold;">
+                                        {{ $initials }}
+                                    </div>
+                                    <span class="text-xs font-weight-bold mb-0">{{ ucwords($data->name) }}</span>
+                                </div>
                             </td>
-                            <td>
-                                <p class="text-xs font-weight-bold mb-0">{{ucwords($data->name)}}</p>
-                            </td>
+
                             <td>
                                 <p class="text-xs font-weight-bold mb-0">{{ucwords($data->mobile)}}</p>
                             </td>
@@ -89,7 +101,8 @@
                                         <ul class="dropdown-menu" aria-labelledby="actionsDropdown{{ $data->id }}">
                                             {{-- <li><a class="dropdown-item" href="#"
                                                     onclick="transferEmployee({{ $data->id }})" data-bs-toggle="modal"
-                                                    data-bs-target="#transferModal{{ $data->id }}">Transfer</a></li> --}}
+                                                    data-bs-target="#transferModal{{ $data->id }}">Transfer</a></li>
+                                            --}}
                                             <li>
                                                 <a class="dropdown-item" href="#"
                                                     onclick="editEmployee({{ $data->id }})" data-bs-toggle="modal"
