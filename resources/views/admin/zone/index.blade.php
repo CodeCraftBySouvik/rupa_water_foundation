@@ -386,6 +386,8 @@
                         title: 'Zone added successfully!',
                         showConfirmButton: false,
                         timer: 1500
+                    }).then(() =>{
+                        location.reload();
                     });
 
                       // Reset the form fields
