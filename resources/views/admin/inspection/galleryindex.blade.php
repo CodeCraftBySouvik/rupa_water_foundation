@@ -46,13 +46,17 @@
                                             <div class="text-center">
                                                 @if (!empty($item->image_path) &&
                                                 file_exists(public_path($item->image_path)))
-                                                <img src="{{ asset($item->image_path) }}" alt="image_gallery"
-                                                    style="height: 50px; width: 70px; object-position: center;"
-                                                    class="img-thumbnail mr-2">
+                                                <a href="{{ asset($item->image_path) }}" target="_blank">
+                                                    <img src="{{ asset($item->image_path) }}" alt="image_gallery"
+                                                        style="height: 50px; width: 70px; object-position: center;"
+                                                        class="img-thumbnail mr-2">
+                                                </a>
                                                 @else
-                                                <img src="{{ asset('assets/images/placeholder.jpg') }}"
-                                                    alt="image-gallery" style="height: 50px" class="mr-2">
-                                                @endif
+                                                <a href="{{ asset('assets/images/placeholder.jpg') }}" target="_blank">
+                                                    <img src="{{ asset('assets/images/placeholder.jpg') }}"
+                                                        alt="image-gallery" style="height: 50px" class="mr-2">
+                                                    @endif
+                                                </a>
                                             </div>
                                         </td>
                                         <td class="text-center">
