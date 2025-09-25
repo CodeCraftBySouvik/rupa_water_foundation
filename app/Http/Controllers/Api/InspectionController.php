@@ -90,31 +90,7 @@ class InspectionController extends Controller
 
 
 
-    //  public function inspectionGalleryStore($id)
-    // {
-    //     $inspection = Inspection::find($id);
-
-    //     if (!$inspection) {
-    //         return response()->json([
-    //             'status'  => false,
-    //             'message' => 'Inspection not found',
-    //         ], 404);
-    //     }
-
-    //     $images = InspectionImage::where('inspection_id', $id)
-    //               ->get()
-    //               ->map(function ($img) {
-    //                   return [
-    //                       'url' => asset($img->image_path), // full URL
-    //                   ];
-    //               });
-
-    //     return response()->json([
-    //         'status'       => true,
-    //         'inspectionId' => $id,
-    //         'images'       => $images,
-    //     ]);
-    // }
+    
     
    public function inspectionGalleryStore(Request $request)
     {
@@ -123,7 +99,15 @@ class InspectionController extends Controller
             'images'        => 'required|array|min:1',
             'images.*'      => 'image|max:5120',
         ]);
-    
+
+         // Total images uploaded by user
+        $uploadedCount = count($request->file('images'));
+        if($uploadedCount !== count($request->images)){
+            return response()->json([
+                'status' => false,
+                'message' => "Image submission failed"
+            ]);
+        }
         $uploadedImages = [];
     
         foreach ($request->file('images') as $img) {
@@ -131,7 +115,7 @@ class InspectionController extends Controller
             $img->move(public_path('uploads/inspection_galleries'), $name);
     
             $path = 'uploads/inspection_galleries/' . $name;
-    
+            
             // Save to DB
             InspectionImage::create([
                 'inspection_id' => $request->inspection_id,
