@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use App\Models\Inspection;
 use App\Models\{Location, User, InspectionImage};
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 
 class InspectionController extends Controller
 {
@@ -32,10 +34,26 @@ class InspectionController extends Controller
         ];
     }
 
-    public function index(){
-        $inspections = Inspection::latest()->get();
-        return view('admin.inspection.index',compact('inspections'));
+     public function index(Request $request)
+    {
+        // Eager load relationships used in the view for better performance
+        $query = Inspection::with(['location', 'checker'])->latest(); 
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            // Parse the start date and set its time to the beginning of the day (00:00:00)
+            $start = Carbon::parse($request->start_date)->startOfDay();
+            
+            // Parse the end date and set its time to the end of the day (23:59:59)
+            $end = Carbon::parse($request->end_date)->endOfDay(); 
+            
+            // Assuming checkedBetweenDates uses whereBetween or equivalent
+            $query->checkedBetweenDates($start, $end);
+        }
+
+        $inspections = $query->get();
+        return view('admin.inspection.index', compact('inspections'));
     }
+
 
     public function create(){
         $locations = Location::pluck('title','id');
@@ -162,6 +180,74 @@ class InspectionController extends Controller
         return redirect()->route('inspection.galleries.list', ['inspection_id' => $gallery->inspection_id])
                         ->with('success', 'Image updated successfully.');
     }
+
+    public function export(Request $request)
+{
+    $request->validate([
+        'start_date' => 'nullable|date',
+        'end_date'   => 'nullable|date|after_or_equal:start_date',
+    ]);
+
+    $query = Inspection::with(['location','checker']);
+
+    if ($request->start_date) {
+        $query->whereDate('checked_date', '>=', $request->start_date);
+    }
+    if ($request->end_date) {
+        $query->whereDate('checked_date', '<=', $request->end_date);
+    }
+
+    $inspections = $query->get();
+
+    $response = new StreamedResponse(function() use ($inspections) {
+        $handle = fopen('php://output', 'w');
+
+        // Add CSV header
+        fputcsv($handle, [
+            'Checked Date',
+            'Location',
+            'Checked By',
+            'Water Quality',
+            'Electric Available',
+            'Cooling System',
+            'Cleanliness',
+            'Tap Condition',
+            'Electric Meter',
+            'Compressor',
+            'Light',
+            'Filter',
+            'Electric Usage',
+            'Notes'
+        ]);
+
+        // Add rows
+        foreach ($inspections as $in) {
+            fputcsv($handle, [
+                $in->checked_date,
+                $in->location->title ?? '-',
+                $in->checker->name ?? '-',
+                $in->water_quality,
+                $in->electric_available,
+                $in->cooling_system,
+                $in->cleanliness,
+                $in->tap_condition,
+                $in->electric_meter_working,
+                $in->compressor_condition,
+                $in->light_availability,
+                $in->filter_condition,
+                $in->electric_usage_method,
+                $in->notes,
+            ]);
+        }
+
+        fclose($handle);
+    });
+
+    $response->headers->set('Content-Type', 'text/csv');
+    $response->headers->set('Content-Disposition', 'attachment; filename="inspections.csv"');
+
+    return $response;
+}
 
 
 

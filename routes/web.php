@@ -78,6 +78,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/galleries/store', [InspectionController::class, 'galleryStore'])->name('galleries.Store');
 		Route::get('/galleries/edit/{id}', [InspectionController::class, 'galleryEdit'])->name('galleries.edit');
 		Route::post('/galleries/update', [InspectionController::class, 'galleryUpdate'])->name('galleries.update');
+		Route::get('/export', [InspectionController::class, 'export'])->name('export');
+		
 	});
 
 	// Zone management

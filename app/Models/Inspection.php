@@ -32,4 +32,9 @@ class Inspection extends Model
     public function checker(){
         return $this->belongsTo(User::class,'checked_by','id');
     }
+
+    public function scopeCheckedBetweenDates(Builder $query, Carbon $start, Carbon $end): void
+    {
+        $query->whereBetween('checked_date', [$start, $end]);
+    }
 }

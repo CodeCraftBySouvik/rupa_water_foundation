@@ -8,12 +8,37 @@
         <div id="alert">
             @include('components.alert')
         </div>
-        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-            <h6>Inspection History</h6>
-            <a href="{{route('inspection.create')}}" class="btn btn-primary btn-sm">New Inspection</a>
+        <div class="card-header pb-0 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+            <h6 class="mb-2 mb-md-0">Inspection History</h6>
+            <div class="d-flex flex-wrap align-items-end gap-2">
+                <form id="filterForm" action="{{route('inspection.index')}}" method="GET" class="d-flex gap-2 flex-wrap align-items-end">
+                    <div class="d-flex flex-column"  style="margin-bottom: 15px;">
+                        <!-- Start Date -->
+                        <label for="start_date">Start Date</label>
+                        <input type="date" class="form-control form-control-sm" id="start_date" name="start_date"
+                            placeholder="Start Date" style="width: 150px;" value="{{ request('start_date') }}">
+                    </div>
+                    <div class="d-flex flex-column" style="margin-bottom: 15px;">
+                        <!-- End Date -->
+                        <label for="end_date">End Date</label>
+                        <input type="date" class="form-control form-control-sm" id="end_date" name="end_date"
+                            placeholder="End Date" style="width: 150px;" value="{{ request('end_date') }}" >
+                    </div>
+                      <div class="d-flex flex-column">
+                        <label>&nbsp;</label>
+                        <a href="{{route('inspection.index')}}" class="btn btn-primary btn-sm" id="refreshBtn"> <i class="fa fa-refresh"></i></a>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <label>&nbsp;</label>
+                        <button type="submit" formaction="{{ route('inspection.export') }}" class="btn btn-success btn-sm" id="exportBtn"> <i
+                                class="fa fa-download"></i> Export</button>
+                    </div>
+                </form>
+                <a href="{{route('inspection.create')}}" class="btn btn-primary btn-sm">New Inspection</a>
+            </div>
         </div>
 
-        <div class="card-body px-0 pt-0 pb-2">
+        <div class="card-body px-0 pt-0 pb-2 mt-2">
             <div class="table-responsive p-0">
 
                 <table class="table align-items-center mb-0">
@@ -22,7 +47,7 @@
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                 Location</th>
-                            
+
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                 Report</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
@@ -37,8 +62,8 @@
                         <tr class="text-center">
 
                             {{-- checked date --}}
-                            <td class="text-xs font-weight-bold">
-                                {{ \Carbon\Carbon::parse($in->checked_date)->format('d M Y') }}
+                            <td class="text-xs font-weight-bold" data-date="{{ $in->checked_date }}">
+                                {{ \Carbon\Carbon::parse($in->checked_date)->format('d M Y') }}
                             </td>
 
                             {{-- location title --}}
@@ -74,7 +99,7 @@
                             <td class="text-end">
                                 <a href="{{route('inspection.edit',$in->id)}}" class="btn btn-dark btn-sm mt-1">Edit</a>
 
-                               
+
                                 <a href="{{ route('inspection.galleries.list', ['inspection_id' => $in->id]) }}"
                                     class="btn btn-info btn-sm mt-1">
                                     Gallery</a>
@@ -169,7 +194,7 @@
                                 <th>Notes</th>
                                 <td id="report-notes"></td>
                             </tr>
-                          
+
                         </tbody>
                     </table>
                 </div>
@@ -186,6 +211,38 @@
 </div>
 @endsection
 @section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const startDate = document.getElementById('start_date');
+    const endDate = document.getElementById('end_date');
+    const table = document.querySelector('table tbody');
+
+    function filterRows() {
+    const start = startDate.value ? new Date(startDate.value) : null;
+    const end = endDate.value ? new Date(endDate.value) : null;
+
+    const rows = table.querySelectorAll('tr');
+
+    rows.forEach(row => {
+        const dateCell = row.querySelector('td:first-child');
+        if (!dateCell) return;
+
+        const rowDate = new Date(dateCell.dataset.date); // use data-date in YYYY-MM-DD
+        let show = true;
+
+        if (start && rowDate < start) show = false;
+        if (end && rowDate > end) show = false;
+
+        row.style.display = show ? '' : 'none';
+    });
+}
+
+
+    startDate.addEventListener('change', filterRows);
+    endDate.addEventListener('change', filterRows);
+});
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
     const reportButtons = document.querySelectorAll('.show-report');
