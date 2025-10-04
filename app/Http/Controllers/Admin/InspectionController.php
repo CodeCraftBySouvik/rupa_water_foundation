@@ -37,7 +37,7 @@ class InspectionController extends Controller
      public function index(Request $request)
     {
         // Eager load relationships used in the view for better performance
-        $query = Inspection::with(['location', 'checker'])->latest(); 
+        $query = Inspection::with(['location', 'checker'])->orderBy('checked_date','desc'); 
 
         if ($request->filled('start_date') && $request->filled('end_date')) {
             // Parse the start date and set its time to the beginning of the day (00:00:00)
@@ -48,6 +48,21 @@ class InspectionController extends Controller
             
             // Assuming checkedBetweenDates uses whereBetween or equivalent
             $query->checkedBetweenDates($start, $end);
+        }
+
+         // ✅ Search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('location', function ($q2) use ($search) {
+                    $q2->where('title', 'like', "%{$search}%");
+                })
+                ->orWhereHas('checker', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                })
+                ->orWhere('notes', 'like', "%{$search}%");
+            });
         }
 
         $inspections = $query->get();
@@ -188,7 +203,8 @@ class InspectionController extends Controller
         'end_date'   => 'nullable|date|after_or_equal:start_date',
     ]);
 
-    $query = Inspection::with(['location','checker']);
+    $query = Inspection::with(['location','checker'])
+                         ->orderBy('checked_date', 'desc'); ;
 
     if ($request->start_date) {
         $query->whereDate('checked_date', '>=', $request->start_date);
@@ -197,11 +213,22 @@ class InspectionController extends Controller
         $query->whereDate('checked_date', '<=', $request->end_date);
     }
 
+     // Search filter
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->whereHas('location', fn($q2) => $q2->where('title', 'like', "%{$search}%"))
+              ->orWhereHas('checker', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+              ->orWhere('notes', 'like', "%{$search}%");
+        });
+    }
+
     $inspections = $query->get();
 
     $response = new StreamedResponse(function() use ($inspections) {
         $handle = fopen('php://output', 'w');
-
+         // Write UTF-8 BOM
+        fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
         // Add CSV header
         fputcsv($handle, [
             'Checked Date',

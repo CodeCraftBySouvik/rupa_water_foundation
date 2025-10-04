@@ -147,104 +147,110 @@ class ZoneController extends Controller
 
    
 
-public function import(Request $request)
-{
- 
-    $errors = [];
-    $inserted = 0;
+    public function import(Request $request)
+    {
+    
+        $errors = [];
+        $inserted = 0;
 
-    try {
-        $file = $request->file('file');
+        try {
+            $file = $request->file('file');
 
-        if (!$file || !$file->isValid()) {
-            throw new \Exception('Invalid file upload.');
-        }
-
-        $path = $file->getRealPath();
-        $fileHandle = fopen($path, 'r');
-
-        $header = fgetcsv($fileHandle); // Skip header row
-
-        while ($row = fgetcsv($fileHandle)) {
-            if (count($row) < 4) {
-                $errors[] = "Invalid row format: " . implode(',', $row);
-                continue;
+            if (!$file || !$file->isValid()) {
+                throw new \Exception('Invalid file upload.');
             }
 
-            $zoneName      = trim($row[0]); 
-            $locationTitle = trim($row[1]); 
-            $openingDate   = trim($row[2]); 
-            $size          = trim($row[3]); 
+            $path = $file->getRealPath();
+            $fileHandle = fopen($path, 'r');
 
-            try {
-                // Find Zone
-                $zone = Zone::where('name', $zoneName)->first();
-                if (!$zone) {
-                    $errors[] = "Zone '{$zoneName}' not found.";
+            $header = fgetcsv($fileHandle); // Skip header row
+
+            while ($row = fgetcsv($fileHandle)) {
+                if (count($row) < 4) {
+                    $errors[] = "Invalid row format: " . implode(',', $row);
                     continue;
                 }
 
-                // Generate new Location always (even if duplicate)
-                $lastId = Location::max('id') ?? 0;
-                $nextNumber = $lastId + 1;
-                $newLocationId = 'RUPA' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+                $zoneName      = trim($row[0]); 
+                $locationTitle = trim($row[1]); 
+                $openingDate   = trim($row[2]); 
+                $size          = trim($row[3]); 
 
-                $location = Location::create([
-                    'location_id'   => $newLocationId,
-                    'title'         => $locationTitle,
-                    'position'      => $size,
-                    'opening_date'  => $openingDate,
-                    'status'        => 'active',
-                ]);
+                try {
+                    // Find Zone
+                    $zone = Zone::where('name', $zoneName)->first();
+                    if (!$zone) {
+                        $errors[] = "Zone '{$zoneName}' not found.";
+                        continue;
+                    }
 
-                // Parse date safely
-                $parsedDate = \DateTime::createFromFormat('d.m.y', $openingDate);
-                if (!$parsedDate) {
-                    $errors[] = "Invalid date format: {$zoneName}, {$openingDate}";
+                    // Generate new Location always (even if duplicate)
+                    $lastId = Location::max('id') ?? 0;
+                    $nextNumber = $lastId + 1;
+                    $newLocationId = 'RUPA' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+                    $location = Location::create([
+                        'location_id'   => $newLocationId,
+                        'title'         => $locationTitle,
+                        'position'      => $size,
+                        'opening_date'  => $openingDate,
+                        'status'        => 'active',
+                    ]);
+
+                    // Parse date safely
+                    $parsedDate = \DateTime::createFromFormat('d.m.y', $openingDate);
+                    if (!$parsedDate) {
+                        $errors[] = "Invalid date format: {$zoneName}, {$openingDate}";
+                        continue;
+                    }
+
+                    // Always insert ZoneWiseLocation (duplicates allowed)
+                    ZoneWiseLocation::create([
+                        'zone_id'       => $zone->id,
+                        'location_id'   => $location->id,
+                        'position'      => $size,
+                        'opening_date'  => $parsedDate->format('Y-m-d'),
+                        'status'        => 'active',
+                    ]);
+
+                    $inserted++;
+
+                } catch (\Exception $ex) {
+                    $errors[] = "Row failed: " . implode(',', $row) . " | Error: " . $ex->getMessage();
                     continue;
                 }
-
-                // Always insert ZoneWiseLocation (duplicates allowed)
-                ZoneWiseLocation::create([
-                    'zone_id'       => $zone->id,
-                    'location_id'   => $location->id,
-                    'position'      => $size,
-                    'opening_date'  => $parsedDate->format('Y-m-d'),
-                    'status'        => 'active',
-                ]);
-
-                $inserted++;
-
-            } catch (\Exception $ex) {
-                $errors[] = "Row failed: " . implode(',', $row) . " | Error: " . $ex->getMessage();
-                continue;
             }
+
+            fclose($fileHandle);
+
+            return redirect()->back()->with([
+                'success'  => "CSV imported successfully. Inserted: {$inserted}, Errors: " . count($errors),
+                'import_errors'   => $errors
+            ]);
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-
-        fclose($fileHandle);
-
-        return redirect()->back()->with([
-            'success'  => "CSV imported successfully. Inserted: {$inserted}, Errors: " . count($errors),
-            'import_errors'   => $errors
-        ]);
-
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', $e->getMessage());
     }
-}
-
-
-
-
-
 
 
     public function zoneWiseLocationIndex(Request $request){
         $getZones = Zone::latest()->get();
         $getLocations = Location::all();
-         $locations = ZoneWiseLocation::with('location_details')->latest()->get();
-         
+        $query  = ZoneWiseLocation::with('location_details')->latest();
         
+         if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('location_details', function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%");
+            })
+            ->orWhereHas('zone_name', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        $locations = $query->get();
+
         return view('admin.zone.location.index',compact('getZones','getLocations','locations'));
     }
 

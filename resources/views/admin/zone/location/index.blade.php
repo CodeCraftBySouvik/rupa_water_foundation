@@ -1,6 +1,7 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
+
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
@@ -16,11 +17,20 @@
                         </ul>
                     </div>
                     @endif
-
                 </div>
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6>Zone Wise Location</h6>
-                    <div class="col-auto">
+                    <div class="d-flex align-items-center">
+                        <!-- 🔍 Search Bar -->
+                        <form method="GET" action="{{ route('zone.location.index') }}" class="d-flex me-2">
+                             <div class="search-wrapper">
+                            <input type="text" name="search" id="searchBox" value="{{ request('search') }}"
+                                class="form-control form-control-sm mb-3" placeholder="Search..."
+                                onkeyup="searchLocations(this.value)">
+                             </div>
+                        </form>
+
+                        <!-- Import Button -->
                         <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#importModal">
                             <i class="fas fa-file-csv me-1"></i> Import
@@ -211,8 +221,10 @@
 </div>
 @endsection
 @section('scripts')
+
+
 <script>
-        function editZoneLocation(id) {
+    function editZoneLocation(id) {
         let url = "{{ route('zone.location.edit', ':id') }}".replace(':id', id);
 
         $.ajax({
