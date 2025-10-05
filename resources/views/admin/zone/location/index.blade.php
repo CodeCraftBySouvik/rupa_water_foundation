@@ -23,11 +23,15 @@
                     <div class="d-flex align-items-center">
                         <!-- 🔍 Search Bar -->
                         <form method="GET" action="{{ route('zone.location.index') }}" class="d-flex me-2">
-                             <div class="search-wrapper">
+                             <div class="search-wrapper me-2">
                             <input type="text" name="search" id="searchBox" value="{{ request('search') }}"
                                 class="form-control form-control-sm mb-3" placeholder="Search..."
-                                onkeyup="searchLocations(this.value)">
+                                >
                              </div>
+                              <div>
+                                <a href="{{route('zone.location.index')}}" class="btn btn-primary btn-sm" id="refreshBtn"> <i
+                                class="fa fa-refresh"></i></a>
+                              </div>
                         </form>
 
                         <!-- Import Button -->

@@ -10,7 +10,7 @@
         </div>
         <div
             class="card-header pb-0 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
-            <h6 class="mb-2 mb-md-0">Inspection History</h6>
+            <h6 class="mb-2 mb-md-0">Inspection History (Total {{$inspections->count()}})</h6>
             <div class="d-flex flex-wrap align-items-end gap-2">
                 <form id="filterForm" action="{{route('inspection.index')}}" method="GET"
                     class="d-flex gap-2 flex-wrap align-items-end">

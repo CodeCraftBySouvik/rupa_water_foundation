@@ -1,7 +1,26 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
+<style>
+    /* Custom class for the icon position and styling */
+.password-toggle-icon {
+    
+    right: 10px; 
+    top: 50%;
+    transform: translateY(-50%); 
+    z-index: 100; 
+    padding: 0 5px; 
+    color: #6c757d; 
+}
+#employee_password {
+  -webkit-text-security: none !important;
+  text-security: none !important;
+  color: inherit !important;
+  text-shadow: none !important;
+}
 
+
+</style>
 
 <div class="container-fluid py-4">
     <div id="alert">
@@ -21,7 +40,8 @@
                 <table class="table align-items-center">
                     <thead>
                         <tr class="text-center">
-                            {{-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sl.No</th> --}}
+                            {{-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sl.No
+                            </th> --}}
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Name
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Mobile
@@ -47,11 +67,11 @@
                         <tr class="text-center">
                             {{-- <td> --}}
                                 {{-- <h6 class="mb-0 text-sm">{{$key + 1}}</h6> --}}
-                            {{-- </td> --}}
+                                {{-- </td> --}}
                             @php
-                                $words = explode(' ', $data->name);
-                                $initials = strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr(end($words), 0,
-                                1) : ''));
+                            $words = explode(' ', $data->name);
+                            $initials = strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr(end($words), 0,
+                            1) : ''));
                             @endphp
                             <td>
                                 <div class="d-flex align-items-center">
@@ -390,8 +410,21 @@
                                     placeholder="Enter email">
                                 <div class="text-danger small" id="edit_employee_email_error"></div>
                             </div>
-                            <input type="text" name="fakeusernameremembered" style="display:none;">
-                            <input type="password" name="fakepasswordremembered" style="display:none;">
+
+
+                            <!-- Password -->
+                            <div class="col-md-6">
+                                <label for="employee_edit_password" class="form-label">Password *</label>
+                                <div class="position-relative">
+                                    <input type="password" class="form-control" name="edit_password" id="employee_edit_password"
+                                        placeholder="Enter password">
+                                    <span class="password-toggle-icon position-absolute" style="cursor: pointer;"
+                                        id="toggleEditPassword">
+                                        <i class="fa fa-eye"></i>
+                                    </span>
+                                </div>
+                                <div class="text-danger small" id="employee_edit_password_error"></div>
+                            </div>
 
                             <!-- Phone -->
                             <div class="col-md-6">
@@ -466,6 +499,21 @@
 @endsection
 @section('scripts')
 <script>
+
+     const passwordField = document.getElementById("employee_edit_password");
+    const togglePassword = document.getElementById("toggleEditPassword");
+
+    togglePassword.addEventListener("click", function () {
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            this.innerHTML = '<i class="fa fa-eye-slash"></i>';
+        } else {
+            passwordField.type = "password";
+            this.innerHTML = '<i class="fa fa-eye"></i>';
+        }
+    });
+
+
     $('#employee_zone').select2({
          placeholder: "Select Zone",
         allowClear: true,
@@ -545,6 +593,7 @@
                     $('#edit_employee_id').val(employee.id);
                     $('#edit_employee_name').val(employee.name);
                     $('#edit_employee_email').val(employee.email);
+                    $('#employee_edit_password').val(employee.password);
                     $('#edit_employee_phone').val(employee.mobile);
                     $('#edit_employee_alternate_number').val(employee.alternate_mobile);
                     $('#edit_employee_role').val(employee.role);
@@ -604,6 +653,7 @@
                     let fieldMap = {
                     edit_name: 'edit_employee_name_error',
                     edit_email: 'edit_employee_email_error',
+                    edit_password: 'employee_edit_password_error',
                     edit_phone: 'edit_employee_phone_error',
                     edit_alternate_number: 'edit_employee_alternate_number_error',
                     edit_role: 'edit_employee_role_error',
