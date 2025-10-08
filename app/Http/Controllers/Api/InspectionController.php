@@ -63,6 +63,9 @@ class InspectionController extends Controller
         'filter_condition'       => 'required|in:ok,not ok',
         'electric_usage_method'  => 'required|in:hooking,proper',
         'notes'                  => 'nullable|string|max:1000',
+        'latitude'               => 'required',
+        'longitude'              => 'required',
+        'address'               =>  'required',
     ];
 
     $validator = Validator::make($request->all(), $rules);
@@ -80,7 +83,6 @@ class InspectionController extends Controller
     $data['checked_by'] = auth()->id(); // Force checked_by to logged-in user
 
     $inspection = Inspection::create($data);
-
     return response()->json([
         'status'     => true,
         'message'    => 'Inspection stored successfully',

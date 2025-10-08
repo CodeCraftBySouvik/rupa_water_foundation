@@ -22,7 +22,10 @@ class Inspection extends Model
         'light_availability', 
         'filter_condition', 
         'electric_usage_method', 
-        'notes'
+        'notes',
+        'latitude',
+        'longitude',
+        'address'
     ];
 
     public function location(){

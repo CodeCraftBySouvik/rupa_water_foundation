@@ -14,7 +14,7 @@
             <div class="d-flex flex-wrap align-items-end gap-2">
                 <form id="filterForm" action="{{route('inspection.index')}}" method="GET"
                     class="d-flex gap-2 flex-wrap align-items-end">
-                    
+
                     <div class="d-flex flex-column" style="margin-bottom: 15px;">
                         <label for="search">Search</label>
                         <input type="text" class="form-control form-control-sm" id="search" name="search"
@@ -64,6 +64,8 @@
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                 Checked By</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
+                                GeoLocation</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                 Action </th>
                         </tr>
                     </thead>
@@ -104,6 +106,18 @@
                             {{-- checker --}}
                             <td class="text-center">
                                 <p class="text-xs mb-0">{{ $in->checker->name ?? '—' }}</p>
+                            </td>
+
+                            {{-- Geolocation --}}
+                            <td class="text-center">
+                                <p class="text-xs mb-0">
+                                    <button class="btn btn-outline-primary btn-sm mt-1 show-location"
+                                        data-id="{{ $in->id }}" data-lat="{{$in->latitude}}"
+                                        data-lng="{{$in->longitude}}" 
+                                        data-address="{{$in->address}}">
+                                        Location
+                                    </button>
+                                </p>
                             </td>
 
                             {{-- actions --}}
@@ -218,6 +232,40 @@
         </div>
     </div>
 
+    {{-- Geo Location Modal --}}
+    <!-- Location Modal -->
+    <div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="locationModalLabel">GeoLocation Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-sm text-center">
+                        <tr>
+                            <th>Latitude</th>
+                            <td id="geo-latitude"></td>
+                        </tr>
+                        <tr>
+                            <th>Longitude</th>
+                            <td id="geo-longitude"></td>
+                        </tr>
+                        <tr>
+                            <th>Address</th>
+                            <td id="geo-address"></td>
+                        </tr>
+                       
+                    </table>
+                </div>
+                <div class="modal-footer">
+                   
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 </div>
 @endsection
@@ -255,7 +303,7 @@
 });
 </script> --}}
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
     const startDate = document.getElementById('start_date');
     const endDate   = document.getElementById('end_date');
     const search    = document.getElementById('search'); // 🔎 add search input
@@ -324,5 +372,29 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const locationButtons = document.querySelectorAll('.show-location');
+    const locationModal = new bootstrap.Modal(document.getElementById('locationModal'));
+
+    locationButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const lat = this.dataset.lat || '—';
+            const lng = this.dataset.lng || '—';
+            const address = this.dataset.address || '—';
+            
+
+            document.getElementById('geo-latitude').innerText = lat;
+            document.getElementById('geo-longitude').innerText = lng;
+            document.getElementById('geo-address').innerText = address;
+
+
+            locationModal.show();
+        });
+    });
+});
+</script>
+
 
 @endsection
