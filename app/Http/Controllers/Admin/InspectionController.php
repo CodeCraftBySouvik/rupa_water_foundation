@@ -233,6 +233,9 @@ class InspectionController extends Controller
         fputcsv($handle, [
             'Checked Date',
             'Location',
+            'Latitude',
+            'Longitude',
+            'Address',
             'Checked By',
             'Water Quality',
             'Electric Available',
@@ -252,6 +255,9 @@ class InspectionController extends Controller
             fputcsv($handle, [
                 $in->checked_date,
                 $in->location->title ?? '-',
+                $in->latitude,
+                $in->longitude,
+                $in->address,
                 $in->checker->name ?? '-',
                 $in->water_quality,
                 $in->electric_available,
