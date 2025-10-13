@@ -10,9 +10,11 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h6 class="font-weight-bolder text-white mb-0"></h6>
+         @if(!\App\Helpers\Helpers::isSupervisor())
         <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addZoneModal">
             + Add Zone
         </button>
+        @endif
     </div>
 
     <!-- Add Zone Modal -->
@@ -55,7 +57,9 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="card-title"> <i class="fas fa-building"></i> {{$zone->name}} </h5>
 
+                       
                         <div class="d-flex align-items-center">
+                            @if(!\App\Helpers\Helpers::isSupervisor())
                             <span class="badge bg-success me-2" style="cursor: pointer;" id="zone-status-{{$zone->id}}"
                                 onclick="toggleZoneStatus({{$zone->id}})">Active</span>
                             <a data-bs-toggle="modal" data-bs-target="#editZoneModal"
@@ -63,6 +67,7 @@
                                 style="width:32px; height:32px; cursor:pointer;" onclick="editZone({{$zone->id}})">
                                 <i class="fa fa-edit"></i>
                             </a>
+                            @endif
                         </div>
 
                     </div>

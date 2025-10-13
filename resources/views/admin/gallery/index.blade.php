@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid py-4">
     <div class="row">
-        <div class="col-8">
+        <div class="{{ \App\Helpers\Helpers::isSupervisor() ? 'col-12' : 'col-8' }}">
             <div class="card mb-4">
                 <div id="alert">
                     @include('components.alert')
@@ -47,7 +47,7 @@
                 </div>
             </div>
         </div>
-
+        @if (!\App\Helpers\Helpers::isSupervisor())
         <div class="col-md-4">
             <form method="POST" action="{{route('gallery.store')}}" enctype="multipart/form-data">
                 @csrf
@@ -74,7 +74,7 @@
                 </div>
             </form>
         </div>
-
+        @endif
     </div>
     {{-- @include('layouts.footers.auth.footer') --}}
 </div>

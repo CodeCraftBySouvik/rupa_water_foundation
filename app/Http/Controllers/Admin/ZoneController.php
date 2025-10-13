@@ -458,7 +458,7 @@ class ZoneController extends Controller
             'id'            => $employee->id,
             'name'          => $employee->name,
             'email'         => $employee->email,
-            'password'      => $employee->password,
+            'password'      => '',
             'mobile'        => $employee->mobile,
             'alternate_mobile'   => $employee->alternate_number,
             'role'          => $employee->role,
@@ -471,7 +471,7 @@ class ZoneController extends Controller
         $validated = $request->validate([
             'edit_name'              => 'required|string|max:255',
             'edit_email'             => 'required|email|unique:users,email,' . $id,
-            'edit_password'          => 'required',
+            'edit_password'          => 'nullable',
             'edit_phone'             => 'required|digits:10',
             'edit_alternate_number'  => 'nullable|digits:10',
             'edit_role'              => 'required|in:supervisor,employee,complaint',
@@ -490,7 +490,9 @@ class ZoneController extends Controller
             // Update basic fields
             $employee->name = $validated['edit_name'];
             $employee->email            = $validated['edit_email'];
-            $employee->password         = Hash::make($validated['edit_password']);
+            if (!empty($validated['edit_password'])) {
+              $employee->password         = Hash::make($validated['edit_password']);
+            }
             $employee->mobile           = $validated['edit_phone'];
             $employee->alternate_number = $validated['edit_alternate_number'];
             $employee->role             = $validated['edit_role'];

@@ -38,14 +38,16 @@
                         <a href="{{route('inspection.index')}}" class="btn btn-primary btn-sm" id="refreshBtn"> <i
                                 class="fa fa-refresh"></i></a>
                     </div>
+                    @if(!\App\Helpers\Helpers::isSupervisor())
                     <div class="d-flex flex-column">
                         <label>&nbsp;</label>
                         <button type="submit" formaction="{{ route('inspection.export') }}"
                             class="btn btn-success btn-sm" id="exportBtn"> <i class="fa fa-download"></i>
                             Export</button>
                     </div>
+                    <a href="{{route('inspection.create')}}" class="btn btn-primary btn-sm">New Inspection</a>
+                    @endif
                 </form>
-                <a href="{{route('inspection.create')}}" class="btn btn-primary btn-sm">New Inspection</a>
             </div>
         </div>
 
@@ -65,8 +67,10 @@
                                 Checked By</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                 GeoLocation</th>
+                            @if(!\App\Helpers\Helpers::isSupervisor())
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                 Action </th>
+                            @endif
                         </tr>
                     </thead>
 
@@ -113,13 +117,12 @@
                                 <p class="text-xs mb-0">
                                     <button class="btn btn-outline-primary btn-sm mt-1 show-location"
                                         data-id="{{ $in->id }}" data-lat="{{$in->latitude}}"
-                                        data-lng="{{$in->longitude}}" 
-                                        data-address="{{$in->address}}">
+                                        data-lng="{{$in->longitude}}" data-address="{{$in->address}}">
                                         Location
                                     </button>
                                 </p>
                             </td>
-
+                             @if(!\App\Helpers\Helpers::isSupervisor())
                             {{-- actions --}}
                             <td class="text-end">
                                 <a href="{{route('inspection.edit',$in->id)}}" class="btn btn-dark btn-sm mt-1">Edit</a>
@@ -129,6 +132,7 @@
                                     class="btn btn-info btn-sm mt-1">
                                     Gallery</a>
                             </td>
+                            @endif
                         </tr>
                         @empty
                         <tr>
@@ -255,11 +259,11 @@
                             <th>Address</th>
                             <td id="geo-address"></td>
                         </tr>
-                       
+
                     </table>
                 </div>
                 <div class="modal-footer">
-                   
+
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -374,7 +378,7 @@
 </script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
     const locationButtons = document.querySelectorAll('.show-location');
     const locationModal = new bootstrap.Modal(document.getElementById('locationModal'));
 

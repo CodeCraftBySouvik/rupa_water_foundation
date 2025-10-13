@@ -3,23 +3,22 @@
 @section('content')
 <style>
     /* Custom class for the icon position and styling */
-.password-toggle-icon {
-    
-    right: 10px; 
-    top: 50%;
-    transform: translateY(-50%); 
-    z-index: 100; 
-    padding: 0 5px; 
-    color: #6c757d; 
-}
-#employee_password {
-  -webkit-text-security: none !important;
-  text-security: none !important;
-  color: inherit !important;
-  text-shadow: none !important;
-}
+    .password-toggle-icon {
 
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 100;
+        padding: 0 5px;
+        color: #6c757d;
+    }
 
+    #employee_password {
+        -webkit-text-security: none !important;
+        text-security: none !important;
+        color: inherit !important;
+        text-shadow: none !important;
+    }
 </style>
 
 <div class="container-fluid py-4">
@@ -29,10 +28,12 @@
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h6 class="font-weight-bolder mb-0">Employee Directory</h6>
+            @if(!\App\Helpers\Helpers::isSupervisor())
             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#addEmployeeModal">
                 + Add Employee
             </button>
+            @endif
         </div>
 
         <div class="card-body">
@@ -54,10 +55,13 @@
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                 Supervisor
                             </th>
+                            @if(!\App\Helpers\Helpers::isSupervisor())
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status
                             </th>
+
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                 Action</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody id="employeeList">
@@ -101,7 +105,7 @@
                                 <p class="text-xs font-weight-bold mb-0">{{ucwords($data->supervisor ?
                                     $data->supervisor->name : '-')}}</p>
                             </td>
-
+                            @if(!\App\Helpers\Helpers::isSupervisor())
                             <td class="text-center">
                                 <div class="form-check form-switch d-flex justify-content-center">
                                     <input type="checkbox" class="form-check-input" id="statusSwitch{{ $data->id }}" {{
@@ -144,6 +148,7 @@
                                     @endif
                                 </div>
                             </td>
+                            @endif
                             {{-- Complaint Modal --}}
                             <div class="modal fade" id="complaintModal{{ $data->id }}" tabindex="-1"
                                 aria-labelledby="complaintModalLabel{{ $data->id }}" aria-hidden="true">
@@ -416,8 +421,8 @@
                             <div class="col-md-6">
                                 <label for="employee_edit_password" class="form-label">Password *</label>
                                 <div class="position-relative">
-                                    <input type="password" class="form-control" name="edit_password" id="employee_edit_password"
-                                        placeholder="Enter password">
+                                    <input type="password" class="form-control" name="edit_password"
+                                        id="employee_edit_password" placeholder="Enter password">
                                     <span class="password-toggle-icon position-absolute" style="cursor: pointer;"
                                         id="toggleEditPassword">
                                         <i class="fa fa-eye"></i>
@@ -499,8 +504,7 @@
 @endsection
 @section('scripts')
 <script>
-
-     const passwordField = document.getElementById("employee_edit_password");
+    const passwordField = document.getElementById("employee_edit_password");
     const togglePassword = document.getElementById("toggleEditPassword");
 
     togglePassword.addEventListener("click", function () {
@@ -593,7 +597,7 @@
                     $('#edit_employee_id').val(employee.id);
                     $('#edit_employee_name').val(employee.name);
                     $('#edit_employee_email').val(employee.email);
-                    $('#employee_edit_password').val(employee.password);
+                    $('#employee_edit_password').val('');
                     $('#edit_employee_phone').val(employee.mobile);
                     $('#edit_employee_alternate_number').val(employee.alternate_mobile);
                     $('#edit_employee_role').val(employee.role);

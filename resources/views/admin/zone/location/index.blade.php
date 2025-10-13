@@ -23,22 +23,22 @@
                     <div class="d-flex align-items-center">
                         <!-- 🔍 Search Bar -->
                         <form method="GET" action="{{ route('zone.location.index') }}" class="d-flex me-2">
-                             <div class="search-wrapper me-2">
-                            <input type="text" name="search" id="searchBox" value="{{ request('search') }}"
-                                class="form-control form-control-sm mb-3" placeholder="Search..."
-                                >
-                             </div>
-                              <div>
-                                <a href="{{route('zone.location.index')}}" class="btn btn-primary btn-sm" id="refreshBtn"> <i
-                                class="fa fa-refresh"></i></a>
-                              </div>
+                            <div class="search-wrapper me-2">
+                                <input type="text" name="search" id="searchBox" value="{{ request('search') }}"
+                                    class="form-control form-control-sm mb-3" placeholder="Search...">
+                            </div>
+                            <div>
+                                <a href="{{route('zone.location.index')}}" class="btn btn-primary btn-sm"
+                                    id="refreshBtn"> <i class="fa fa-refresh"></i></a>
+                            </div>
                         </form>
-
+                        @if(!\App\Helpers\Helpers::isSupervisor())
                         <!-- Import Button -->
                         <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#importModal">
                             <i class="fas fa-file-csv me-1"></i> Import
                         </button>
+                        @endif
                     </div>
                 </div>
                 {{-- Import Modal --}}
@@ -120,8 +120,10 @@
                                             <th>Location</th>
                                             <th>Position</th>
                                             <th>Opening Date</th>
+                                            @if(!\App\Helpers\Helpers::isSupervisor())
                                             <th>Status</th>
                                             <th>Action</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -145,6 +147,7 @@
                                                     '-' }}
                                                 </span>
                                             </td>
+                                             @if(!\App\Helpers\Helpers::isSupervisor())
                                             <td>
                                                 <div class="form-check form-switch d-flex justify-content-center">
                                                     <input type="checkbox" class="form-check-input"
@@ -163,6 +166,7 @@
                                                     <i class="fa fa-trash text-danger"></i>
                                                 </a>
                                             </td>
+                                            @endif
                                         </tr>
                                         @endforeach
                                     </tbody>

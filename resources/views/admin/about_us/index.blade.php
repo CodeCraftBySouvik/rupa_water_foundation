@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid py-4">
     <div class="row">
-        <div class="col-8">
+        <div class="{{ \App\Helpers\Helpers::isSupervisor() ? 'col-12' : 'col-8' }}">
             <div class="card mb-4">
                 <div id="alert">
                     @include('components.alert')
@@ -53,7 +53,8 @@
             </div>
         </div>
         {{-- --}}
-
+        
+        @if(!\App\Helpers\Helpers::isSupervisor())
         <div class="col-md-4">
             <form method="POST" action="{{route('about_us.update',$aboutUs->id)}}">
                 @csrf
@@ -90,7 +91,7 @@
                 </div>
             </form>
         </div>
-
+        @endif
     </div>
     {{-- @include('layouts.footers.auth.footer') --}}
 </div>
