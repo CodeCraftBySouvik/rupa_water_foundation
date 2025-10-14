@@ -67,10 +67,9 @@
                                 Checked By</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                 GeoLocation</th>
-                            @if(!\App\Helpers\Helpers::isSupervisor())
+                           
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                                 Action </th>
-                            @endif
                         </tr>
                     </thead>
 
@@ -122,17 +121,18 @@
                                     </button>
                                 </p>
                             </td>
-                             @if(!\App\Helpers\Helpers::isSupervisor())
+                            
                             {{-- actions --}}
                             <td class="text-end">
-                                <a href="{{route('inspection.edit',$in->id)}}" class="btn btn-dark btn-sm mt-1">Edit</a>
-
+                                 @if(!\App\Helpers\Helpers::isSupervisor())
+                                -1">Edit</a>
+                                @endif
 
                                 <a href="{{ route('inspection.galleries.list', ['inspection_id' => $in->id]) }}"
                                     class="btn btn-info btn-sm mt-1">
                                     Gallery</a>
                             </td>
-                            @endif
+                            
                         </tr>
                         @empty
                         <tr>
