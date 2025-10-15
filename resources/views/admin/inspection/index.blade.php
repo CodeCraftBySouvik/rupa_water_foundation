@@ -275,37 +275,7 @@
 @endsection
 @section('scripts')
 
-{{-- <script>
-    document.addEventListener('DOMContentLoaded', function () {
-    const startDate = document.getElementById('start_date');
-    const endDate = document.getElementById('end_date');
-    const table = document.querySelector('table tbody');
 
-    function filterRows() {
-    const start = startDate.value ? new Date(startDate.value) : null;
-    const end = endDate.value ? new Date(endDate.value) : null;
-
-    const rows = table.querySelectorAll('tr');
-
-    rows.forEach(row => {
-        const dateCell = row.querySelector('td:first-child');
-        if (!dateCell) return;
-
-        const rowDate = new Date(dateCell.dataset.date); // use data-date in YYYY-MM-DD
-        let show = true;
-
-        if (start && rowDate < start) show = false;
-        if (end && rowDate > end) show = false;
-
-        row.style.display = show ? '' : 'none';
-    });
-}
-
-
-    startDate.addEventListener('change', filterRows);
-    endDate.addEventListener('change', filterRows);
-});
-</script> --}}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
     const startDate = document.getElementById('start_date');

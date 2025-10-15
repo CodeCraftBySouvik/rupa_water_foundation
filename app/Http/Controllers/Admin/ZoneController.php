@@ -254,21 +254,63 @@ class ZoneController extends Controller
         return view('admin.zone.location.index',compact('getZones','getLocations','locations'));
     }
 
-    public function zoneWiseLocationStore(Request $request){
+
+        public function zoneWiseLocationStore(Request $request)
+    {
         $validated = $request->validate([
             'zone_id'       => 'required|exists:zones,id',
-            'location_id' => 'required|string|max:255'
-         ]);
-           // Check if this zone-location combination already exists
-                $exists = ZoneWiseLocation::where('zone_id', $validated['zone_id'])
-                            ->where('location_id', $validated['location_id'])
-                            ->exists();
-        if ($exists) {
-            return redirect()->back()->with('error', 'This Zone and Location combination already exists.');
+            'location_name' => 'required|string|max:255',
+            'position'      => 'required|string|max:255',
+            'opening_date'  => 'required|date',
+        ]);
+
+        try {
+            // Generate new unique location_id
+            $lastId = Location::max('id') ?? 0;
+            $nextNumber = $lastId + 1;
+            $newLocationId = 'RUPA' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+            // Create Location
+            $location = Location::create([
+                'location_id'  => $newLocationId,
+                'title'        => $validated['location_name'],
+                'position'     => $validated['position'] ?? null,
+                'opening_date' => $validated['opening_date'] ?? null,
+                'status'       => 'active',
+            ]);
+
+            // Create ZoneWiseLocation
+            $zoneWiseLocation = ZoneWiseLocation::create([
+                'zone_id'      => $validated['zone_id'],
+                'location_id'  => $location->id,
+                'position'     => $validated['position'] ?? null,
+                'opening_date' => $validated['opening_date'] ?? null,
+                'status'       => 'active',
+            ]);
+
+            return response()->json([
+                'success'  => true,
+                'message'  => 'Zone Location created successfully.',
+                'location' => [
+                    'id'           => $zoneWiseLocation->id,
+                    'zone_id'      => $zoneWiseLocation->zone_id,
+                    'zone_name'    => $zoneWiseLocation->zone->name ?? 'Unknown Zone',
+                    'location_id'  => $location->id,
+                    'location_name'=> $location->title,
+                    'position'     => $location->position,
+                    'opening_date' => $location->opening_date,
+                    'status'       => $zoneWiseLocation->status,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create location: ' . $e->getMessage()
+            ], 500);
         }
-         ZoneWiseLocation::create($validated);
-         return redirect()->back()->with('success', 'Zone Location created successfully.');
     }
+
 
     public function zoneWiseLocationEdit($id){
         $location = ZoneWiseLocation::with('location_details')->findOrFail($id);

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
+
 
 class LoginController extends Controller
 {
@@ -45,5 +47,32 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/login');
+    }
+
+
+    public function changePassword(){
+        return view('auth.change-password');
+    }
+
+    public function changePasswordUpdate(Request $request){
+        $request->validate([
+            'email' => 'required|email|unique:users,email,' . Auth::id(),
+            'password' => 'required|confirmed',
+        ]); 
+
+        // Get Logged in User
+        $user = Auth::guard('web')->user();
+
+        if(!$user){
+            return redirect()->route('login')->with('error','No authenticated user found');
+        }
+
+        // Update email and password
+        $user->email = $request->email ?? null;
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+         return redirect()->route('change.password')->with('success', 'Email and password updated successfully. Please log in again.');
+
     }
 }

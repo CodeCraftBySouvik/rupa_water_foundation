@@ -38,6 +38,10 @@
                             data-bs-target="#importModal">
                             <i class="fas fa-file-csv me-1"></i> Import
                         </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm ms-2" data-bs-toggle="modal"
+                            data-bs-target="#addLocationModal">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
                         @endif
                     </div>
                 </div>
@@ -80,7 +84,66 @@
                     </div>
                 </div>
 
+                {{-- Add Location Modal --}}
+                <div class="modal fade" id="addLocationModal" tabindex="-1" aria-labelledby="addLocationModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <form id="addLocationForm" method="POST" action="{{ route('zone.location.store') }}">
+                            @csrf
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addLocationModalLabel">Add New Zone Location</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body py-4">
+                                    <div class="row g-3">
+                                        <!-- Zone -->
+                                        <div class="col-12">
+                                            <label for="zone_id" class="form-label">Zone *</label>
+                                            <select class="form-select" name="zone_id" id="zone_id" required>
+                                                <option value="" selected hidden>Select Zone</option>
+                                                @foreach($getZones as $zone)
+                                                <option value="{{ $zone->id }}">{{ $zone->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="text-danger small" id="zone_id_error"></div>
+                                        </div>
 
+                                        <!-- Location Name -->
+                                        <div class="col-12">
+                                            <label for="location_name" class="form-label">Location Name *</label>
+                                            <input type="text" class="form-control" name="location_name"
+                                                id="location_name" placeholder="Enter location" required>
+                                            <div class="text-danger small" id="location_name_error"></div>
+                                        </div>
+
+                                        <!-- Position -->
+                                        <div class="col-12">
+                                            <label for="position" class="form-label">Position</label>
+                                            <input type="text" class="form-control" name="position" id="position"
+                                                placeholder="Enter position">
+                                            <div class="text-danger small" id="position_error"></div>
+                                        </div>
+
+                                        <!-- Opening Date -->
+                                        <div class="col-12">
+                                            <label for="opening_date" class="form-label">Opening Date</label>
+                                            <input type="date" class="form-control" name="opening_date"
+                                                id="opening_date">
+                                            <div class="text-danger small" id="opening_date_error"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">Add Location</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
@@ -147,7 +210,7 @@
                                                     '-' }}
                                                 </span>
                                             </td>
-                                             @if(!\App\Helpers\Helpers::isSupervisor())
+                                            @if(!\App\Helpers\Helpers::isSupervisor())
                                             <td>
                                                 <div class="form-check form-switch d-flex justify-content-center">
                                                     <input type="checkbox" class="form-check-input"
@@ -230,7 +293,48 @@
 @endsection
 @section('scripts')
 
+<script>
+$('#addLocationForm').submit(function(e) {
+    e.preventDefault();
+    $('.text-danger.small').text(''); // Clear previous errors
+    let formData = $(this).serialize();
 
+    $.ajax({
+        url: "{{ route('zone.location.store') }}",
+        type: 'POST',
+        data: formData,
+        success: function(response) {
+            if(response.success) {
+                $('#addLocationModal').modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Location Added!',
+                    text: response.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload(); // Or dynamically add row to table
+                });
+            }
+        },
+        error: function(xhr) {
+            if(xhr.status === 422) {
+                let errors = xhr.responseJSON.errors;
+                if(errors.zone_id) $('#zone_id_error').text(errors.zone_id[0]);
+                if(errors.location_name) $('#location_name_error').text(errors.location_name[0]);
+                if(errors.position) $('#position_error').text(errors.position[0]);
+                if(errors.opening_date) $('#opening_date_error').text(errors.opening_date[0]);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An unexpected error occurred.'
+                });
+            }
+        }
+    });
+});
+</script>
 <script>
     function editZoneLocation(id) {
         let url = "{{ route('zone.location.edit', ':id') }}".replace(':id', id);
