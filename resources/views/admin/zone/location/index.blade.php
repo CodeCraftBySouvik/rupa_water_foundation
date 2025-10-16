@@ -184,11 +184,18 @@
 
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
-                        @php
+                        {{-- @php
                         $groupedZones = $locations->groupBy(function($data) {
                         return $data->zone_name ? $data->zone_name->name : 'Unknown Zone';
                         });
                         $totalLocations = collect($groupedZones)->flatten()->count();
+                        @endphp --}}
+
+                        @php
+                            $totalLocations = $getZones->sum(fn($zone) => $zone->zoneLocations->count());
+                            $groupedZones = $getZones->mapWithKeys(function($zone) {
+                            return [$zone->name => $zone->zoneLocations];
+                            });
                         @endphp
                         <div class="d-flex justify-content-between align-items-center mb-2 ms-2">
                             <h6>Total Locations: <span class="badge bg-primary">{{ $totalLocations }}</span></h6>
@@ -200,7 +207,7 @@
                                 <button class="nav-link {{ $loop->first ? 'active' : '' }}"
                                     id="tab-{{ Str::slug($zoneName) }}" data-bs-toggle="tab"
                                     data-bs-target="#content-{{ Str::slug($zoneName) }}" type="button" role="tab">
-                                    {{ $zoneName }}
+                                    {{ ucwords($zoneName) }}
                                     <span class="badge bg-secondary">{{ count($zoneLocations) }}</span>
                                 </button>
                             </li>
@@ -346,13 +353,25 @@
                         showConfirmButton: false,
                         timer: 1500
                     }).then(() =>{
-                        window.location.href = response.redirect;
-                        // location.reload();
+                        // window.location.href = response.redirect;
+                        location.reload();
                     });
 
                       // Reset the form fields
                     $('#addZoneForm')[0].reset();
                     $('#addZoneModal').modal('hide');
+
+                     // --- Add new tab dynamically ---
+                    let zoneSlug = response.name.toLowerCase().replace(/\s+/g, '-');
+                    let newTab = `
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tab-${zoneSlug}" data-bs-toggle="tab" data-bs-target="#content-${zoneSlug}" type="button" role="tab">
+                                ${response.name}
+                                <span class="badge bg-secondary">0</span>
+                            </button>
+                        </li>
+                    `;
+                    $('#zoneTabs').append(newTab);
 
                     $('#zonesList .no-zones-message').remove();
                      let newZoneHtml = `

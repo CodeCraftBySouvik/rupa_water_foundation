@@ -38,6 +38,7 @@ class ZoneController extends Controller
         return response()->json([
             'success' => true,
             'zone' => $zone,
+            'name' => $zone->name,
             'redirect' => route('zone.index'),
             'message' => 'Zone added successfully!',
         ]);
@@ -240,7 +241,7 @@ class ZoneController extends Controller
 
 
     public function zoneWiseLocationIndex(Request $request){
-        $getZones = Zone::where('status','Active')->latest()->get();
+        $getZones = Zone::where('status','Active')->with(['zoneLocations.location_details'])->latest()->get();
         $getLocations = Location::all();
         $query  = ZoneWiseLocation::with('location_details')->latest();
         
