@@ -80,6 +80,7 @@ class InspectionController extends Controller
     public function store(Request $request){
        // dd($request->all());
         $validated = $request->validate($this->rules());
+        $validated['created_by'] = auth()->id();
         Inspection::create($validated);
 
         return redirect()->route('inspection.index')->with('success', 'Inspection saved successfully!');

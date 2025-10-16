@@ -18,13 +18,16 @@
                         <div class="card-body">
                             <div class="row g-3"> {{-- Bootstrap gap utility --}}
                                 @foreach ($item->images as $index => $img)
+                                @if (file_exists(public_path($img)))
                                 <div class="col-md-3 col-sm-4 col-6">
                                     <div class="position-relative rounded overflow-hidden shadow-sm">
-                                        @if (file_exists(public_path($img)))
+                                        
                                             {{-- thumbnail --}}
-                                            <img src="{{ asset($img) }}" class="img-fluid w-100 h-100 object-fit-cover"
-                                            >
-                                        @endif
+                                            <a href="{{ asset($img) }}" class="glightbox" data-gallery="gallery-{{ $item->id }}">
+                                                <img src="{{ asset($img) }}" class="img-fluid w-100 h-100 object-fit-cover"
+                                                >
+                                            </a>
+                                        
                                         {{-- delete X button --}}
                                         <form id="form-{{ $item->id }}-{{ $index }}" method="POST"
                                             action="{{ route('gallery.image.delete', [$item->id, $index]) }}"
@@ -38,6 +41,7 @@
 
                                     </div>
                                 </div>
+                                @endif
                                 @endforeach
                             </div>
 
@@ -80,6 +84,13 @@
 </div>
 @endsection
 @section('scripts')
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const lightbox = GLightbox({
+            selector: '.glightbox'
+        });
+    });
+</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

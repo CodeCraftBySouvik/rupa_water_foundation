@@ -108,7 +108,13 @@
 
                             {{-- checker --}}
                             <td class="text-center">
-                                <p class="text-xs mb-0">{{ $in->checker->name ?? '—' }}</p>
+                                
+                                <p class="text-xs mb-0">
+                                    @if ($in->created_by == 1)
+                                    <img src="{{asset('assets/images/identify.png')}}" alt="" style="height:20px; width:20px; margin-right:5px;">
+                                   @endif
+                                    {{ $in->checker->name ?? '—' }}
+                                </p>
                             </td>
 
                             {{-- Geolocation --}}

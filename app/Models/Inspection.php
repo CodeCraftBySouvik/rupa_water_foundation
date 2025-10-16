@@ -25,7 +25,8 @@ class Inspection extends Model
         'notes',
         'latitude',
         'longitude',
-        'address'
+        'address',
+        'created_by'
     ];
 
     public function location(){
