@@ -35,7 +35,12 @@ class ZoneController extends Controller
         ]);
         // reload zone with counts
         $zone = Zone::with('zoneLocations','zoneEmployees')->find($zone->id);
-        return response()->json($zone);
+        return response()->json([
+            'success' => true,
+            'zone' => $zone,
+            'redirect' => route('zone.index'),
+            'message' => 'Zone added successfully!',
+        ]);
     }
 
     public function toggleStatus($id){
@@ -235,7 +240,7 @@ class ZoneController extends Controller
 
 
     public function zoneWiseLocationIndex(Request $request){
-        $getZones = Zone::latest()->get();
+        $getZones = Zone::where('status','Active')->latest()->get();
         $getLocations = Location::all();
         $query  = ZoneWiseLocation::with('location_details')->latest();
         

@@ -8,17 +8,17 @@
         @include('components.alert')
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    {{-- <div class="d-flex justify-content-between align-items-center mb-4">
         <h6 class="font-weight-bolder text-white mb-0"></h6>
          @if(!\App\Helpers\Helpers::isSupervisor())
         <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addZoneModal">
             + Add Zone
         </button>
         @endif
-    </div>
+    </div> --}}
 
     <!-- Add Zone Modal -->
-    <div class="modal fade" id="addZoneModal" tabindex="-1" role="dialog" aria-labelledby="addZoneModalLabel"
+    {{-- <div class="modal fade" id="addZoneModal" tabindex="-1" role="dialog" aria-labelledby="addZoneModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <form id="addZoneForm">
@@ -46,7 +46,7 @@
                 </div>
             </form>
         </div>
-    </div>
+    </div> --}}
 
     <div class="row" id="zonesList">
         {{-- @if (count($zones)>0) --}}
@@ -60,8 +60,9 @@
                        
                         <div class="d-flex align-items-center">
                             @if(!\App\Helpers\Helpers::isSupervisor())
-                            <span class="badge bg-success me-2" style="cursor: pointer;" id="zone-status-{{$zone->id}}"
-                                onclick="toggleZoneStatus({{$zone->id}})">Active</span>
+                            
+                            <span class="badge {{ $zone->status === 'Active' ? 'bg-success' : 'bg-danger' }} me-2" style="cursor: pointer;" id="zone-status-{{$zone->id}}"
+                                onclick="toggleZoneStatus({{$zone->id}})">{{$zone->status === 'Active' ? 'Active' : 'Inactive'}}</span>
                             <a data-bs-toggle="modal" data-bs-target="#editZoneModal"
                                 class="d-flex justify-content-center align-items-center border rounded p-1"
                                 style="width:32px; height:32px; cursor:pointer;" onclick="editZone({{$zone->id}})">
@@ -375,7 +376,7 @@
         });
     }
 </script>
-<script>
+{{-- <script>
     $(document).ready(function () {
        $('#addZoneForm').on('submit', function(e){
           e.preventDefault();
@@ -444,7 +445,7 @@
             });
        }); 
     });
-</script>
+</script> --}}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll('.delete-image-button').forEach(function (btn) {

@@ -40,7 +40,11 @@
                         </button>
                         <button type="button" class="btn btn-outline-primary btn-sm ms-2" data-bs-toggle="modal"
                             data-bs-target="#addLocationModal">
-                            <i class="fas fa-plus"></i> Add
+                            <i class="fas fa-plus"></i> Add Location
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm ms-2" data-bs-toggle="modal"
+                            data-bs-target="#addZoneModal">
+                            + Add Zone
                         </button>
                         @endif
                     </div>
@@ -139,6 +143,39 @@
                                     <button type="button" class="btn btn-secondary btn-sm"
                                         data-bs-dismiss="modal">Cancel</button>
                                     <button type="submit" class="btn btn-primary btn-sm">Add Location</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {{-- Add Zone Modal --}}
+                <div class="modal fade" id="addZoneModal" tabindex="-1" role="dialog"
+                    aria-labelledby="addZoneModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <form id="addZoneForm">
+                            @csrf
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addZoneModalLabel">Add New Zone</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+
+                                <div class="modal-body">
+                                    <div class="form-group mb-3">
+                                        <label for="zone_name" class="form-control-label">Zone Name</label>
+                                        <input type="text" class="form-control" name="name" id="zone_name">
+                                        <div class="text-danger small" id="zone_name_error"></div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                        data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">Save Zone</button>
                                 </div>
                             </div>
                         </form>
@@ -292,9 +329,79 @@
 </div>
 @endsection
 @section('scripts')
-
 <script>
-$('#addLocationForm').submit(function(e) {
+    $(document).ready(function () {
+       $('#addZoneForm').on('submit', function(e){
+          e.preventDefault();
+            $('#zone_name_error').text('');
+
+            $.ajax({
+                url: "{{ route('zone.store') }}",
+                method: "POST",
+                data: $(this).serialize(),
+                success: function (response) {
+                     Swal.fire({
+                        icon: 'success',
+                        title: 'Zone added successfully!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() =>{
+                        window.location.href = response.redirect;
+                        // location.reload();
+                    });
+
+                      // Reset the form fields
+                    $('#addZoneForm')[0].reset();
+                    $('#addZoneModal').modal('hide');
+
+                    $('#zonesList .no-zones-message').remove();
+                     let newZoneHtml = `
+                            <div class="col-md-4 mb-4" id="zone-card-${response.id}">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="card-title"><i class="fas fa-building"></i> ${response.name} </h5>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-success me-2" style="cursor: pointer;" id="zone-status-${response.id}" onclick="toggleZoneStatus(${response.id})">Active</span>
+                                                <a data-bs-toggle="modal" data-bs-target="#editZoneModal" class="d-flex justify-content-center align-items-center border rounded p-1" style="width:32px; height:32px; cursor:pointer;" onclick="editZone(${response.id})">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-3">
+                                            <div><h4 class="text-primary">${response.zone_employees_count ?? 0}</h4><small>Employees</small></div>
+                                            <div><h4 class="text-primary">${response.zone_locations_count ?? 0}</h4><small>Locations</small></div>
+                                        </div>
+
+                                        <div class="mt-3 d-flex justify-content-between">
+                                            <a href="javascript:void(0);" class="btn btn-outline-secondary btn-sm" onclick="viewLocations(${response.id})">
+                                                <i class="fas fa-map-marker-alt"></i> View Locations
+                                            </a>
+                                            <a href="javascript:void(0);" class="btn btn-outline-secondary btn-sm" onclick="viewEmployees(${response.id})">
+                                                <i class="fas fa-users"></i> View Employees
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        $('#zonesList').append(newZoneHtml);
+                         
+                }, 
+                error: function (xhr) {
+                    let errors = xhr.responseJSON.errors;
+                    if (errors.name) {
+                        $('#zone_name_error').text(errors.name[0]);
+                    }
+                   
+                }
+            });
+       }); 
+    });
+</script>
+<script>
+    $('#addLocationForm').submit(function(e) {
     e.preventDefault();
     $('.text-danger.small').text(''); // Clear previous errors
     let formData = $(this).serialize();
