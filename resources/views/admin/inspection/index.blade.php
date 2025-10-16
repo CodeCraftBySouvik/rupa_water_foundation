@@ -125,7 +125,9 @@
                             {{-- actions --}}
                             <td class="text-end">
                                  @if(!\App\Helpers\Helpers::isSupervisor())
-                                -1">Edit</a>
+                                   <a href="{{ route('inspection.edit',$in->id) }}"
+                                    class="btn btn-info btn-sm mt-1">
+                                    Edit</a>
                                 @endif
 
                                 <a href="{{ route('inspection.galleries.list', ['inspection_id' => $in->id]) }}"

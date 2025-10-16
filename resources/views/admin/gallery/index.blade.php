@@ -20,15 +20,15 @@
                                 @foreach ($item->images as $index => $img)
                                 <div class="col-md-3 col-sm-4 col-6">
                                     <div class="position-relative rounded overflow-hidden shadow-sm">
-
-                                        {{-- thumbnail --}}
-                                        <img src="{{ asset($img) }}" class="img-fluid w-100 h-100 object-fit-cover"
-                                            alt="Gallery image {{ $index + 1 }}">
-
+                                        @if (file_exists(public_path($img)))
+                                            {{-- thumbnail --}}
+                                            <img src="{{ asset($img) }}" class="img-fluid w-100 h-100 object-fit-cover"
+                                            >
+                                        @endif
                                         {{-- delete X button --}}
                                         <form id="form-{{ $item->id }}-{{ $index }}" method="POST"
                                             action="{{ route('gallery.image.delete', [$item->id, $index]) }}"
-                                            class="position-absolute top-0 end-0 m-1">
+                                            class="position-absolute top-0 end-0 m-1" style="z-index:10;">
                                             @csrf
                                             <button type="button"
                                                 class="btn btn-danger btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center delete-image-button"

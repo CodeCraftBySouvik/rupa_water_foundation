@@ -65,10 +65,10 @@
                                                     class="btn btn-dark btn-sm mt-1">
                                                     Edit
                                                 </a>
-                                                {{-- <a href="javascript: void(0)" class="btn btn-sm btn-danger mt-1"
+                                                <a href="javascript: void(0)" class="btn btn-sm btn-danger mt-1"
                                                     onclick="deleteGallery({{$item->id}})">
                                                     Delete
-                                                </a> --}}
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
