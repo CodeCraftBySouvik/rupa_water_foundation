@@ -8,8 +8,8 @@
         <div class="col-md-12">
 
             <div class="card shadow-sm">
-              
-                <form role="form" method="POST" action="{{route('inspection.store') }}">
+
+                <form role="form" method="POST" action="{{route('inspection.store') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="card-header bg-white align-items-center">
                         <h6 class="mb-0">Inspection</h6>
@@ -25,13 +25,13 @@
                                     class="form-control">
                             </div>
                             <div class="col-4">
-                                <label class="form-label">Checked&nbsp;By</label>                              
-                                    <select name="checked_by" id="userSelect" class="form-select js-single-select-user">
+                                <label class="form-label">Checked&nbsp;By</label>
+                                <select name="checked_by" id="userSelect" class="form-select js-single-select-user">
                                     <option value="">-- Select User --</option>
                                     @foreach($checkUser as $id => $name)
-                                        <option value="{{ $id }}" {{ old('checked_by') == $id ? 'selected' : '' }}>
-                                            {{ ucwords($name) }}
-                                        </option>
+                                    <option value="{{ $id }}" {{ old('checked_by')==$id ? 'selected' : '' }}>
+                                        {{ ucwords($name) }}
+                                    </option>
                                     @endforeach
                                 </select>
                                 @error('checked_by') <p class="text-danger small">{{ $message }}</p> @enderror
@@ -41,9 +41,9 @@
                                 <select name="location_id" id="locationSelect" class="form-select js-single-select">
                                     <option value="">-- Select Location --</option>
                                     @foreach($locations as $id => $title)
-                                        <option value="{{ $id }}" {{ old('location_id') == $id ? 'selected' : '' }}>
-                                            {{ $title }}
-                                        </option>
+                                    <option value="{{ $id }}" {{ old('location_id')==$id ? 'selected' : '' }}>
+                                        {{ $title }}
+                                    </option>
                                     @endforeach
                                 </select>
                                 @error('location_id') <p class="text-danger small">{{ $message }}</p> @enderror
@@ -75,8 +75,8 @@
 
                             <div class="mb-3">
                                 <label class="form-label small text-muted">Repairing</label><br>
-                                {!! pill('repairing','floor','Floor',old('repairing')) !!}
-                                {!! pill('repairing','machine','Machine',old('repairing')) !!}
+                                {!! pill('repairing','Floor','Floor',old('repairing')) !!}
+                                {!! pill('repairing','Machine','Machine',old('repairing')) !!}
                                 @error('repairing')
                                 <p class="text-danger small">{{$message}}</p>
                                 @enderror
@@ -128,8 +128,8 @@
                                 <label class="form-label small text-muted">Electric meter working</label><br>
                                 {!! pill('electric_meter_working','yes','Yes',old('electric_meter_working')) !!}
                                 {!! pill('electric_meter_working','no','No',old('electric_meter_working')) !!}
-                                 @error('electric_meter_working')
-                                  <p class="text-danger small">{{$message}}</p>
+                                @error('electric_meter_working')
+                                <p class="text-danger small">{{$message}}</p>
                                 @enderror
                             </div>
 
@@ -138,8 +138,8 @@
                                 <label class="form-label small text-muted">Compressor condition</label><br>
                                 {!! pill('compressor_condition','ok','OK',old('compressor_condition')) !!}
                                 {!! pill('compressor_condition','not ok','Not&nbsp;OK',old('compressor_condition')) !!}
-                                 @error('compressor_condition')
-                                  <p class="text-danger small">{{$message}}</p>
+                                @error('compressor_condition')
+                                <p class="text-danger small">{{$message}}</p>
                                 @enderror
                             </div>
 
@@ -148,8 +148,8 @@
                                 <label class="form-label small text-muted">Light availability</label><br>
                                 {!! pill('light_availability','yes','Yes',old('light_availability')) !!}
                                 {!! pill('light_availability','no','No',old('light_availability')) !!}
-                                 @error('light_availability')
-                                  <p class="text-danger small">{{$message}}</p>
+                                @error('light_availability')
+                                <p class="text-danger small">{{$message}}</p>
                                 @enderror
                             </div>
 
@@ -158,8 +158,8 @@
                                 <label class="form-label small text-muted">Filter condition</label><br>
                                 {!! pill('filter_condition','ok','OK',old('filter_condition')) !!}
                                 {!! pill('filter_condition','not ok','Not&nbsp;OK',old('filter_condition')) !!}
-                                 @error('filter_condition')
-                                  <p class="text-danger small">{{$message}}</p>
+                                @error('filter_condition')
+                                <p class="text-danger small">{{$message}}</p>
                                 @enderror
                             </div>
 
@@ -169,9 +169,18 @@
                                 {!! pill('electric_usage_method','hooking','Hooking',old('electric_usage_method')) !!}
                                 {!! pill('electric_usage_method','proper','Proper',old('electric_usage_method')) !!}
                                 @error('electric_usage_method')
-                                  <p class="text-danger small">{{$message}}</p>
+                                <p class="text-danger small">{{$message}}</p>
                                 @enderror
                             </div>
+                        </div>
+                        {{-- Gallery --}}
+                        <div class="form-group mt-2">
+                            <label for="image">Upload Image <span class="text-danger">*</span></label>
+                            <input type="file" name="images[]" class="form-control" multiple>
+                            @error('images')
+                            <p class="text-danger small">{{ $message }}</p>
+                            @enderror
+                            @error('images.*') <p class="text-danger small">{{ $message }}</p> @enderror
                         </div>
                         {{-- Notes -------------------------------------------------------------- --}}
                         <div class="mb-4">
@@ -186,7 +195,7 @@
             </div>
         </div>
     </div>
-   
+
 </div>
 @endsection
 @section('scripts')

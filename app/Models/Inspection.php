@@ -41,4 +41,8 @@ class Inspection extends Model
     {
         $query->whereBetween('checked_date', [$start, $end]);
     }
+
+    public function inspection_images(){
+        return $this->hasMany(InspectionImage::class);
+    }
 }

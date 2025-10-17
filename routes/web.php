@@ -16,7 +16,9 @@ use App\Http\Controllers\ChangePassword;
 use App\Http\Controllers\Admin\{AboutUsController,GalleryController,LocationController,InspectionController,UserController,ZoneController};            
             
 Route::middleware('site.down')->group(function () {
-Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
+Route::get('/', function () {
+	return redirect('/dashboard');
+})->middleware('auth');
 	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
 	Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
 	Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
@@ -103,6 +105,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/location/update/{id}', [ZoneController::class, 'zoneWiseLocationUpdate'])->name('location.update');
 		Route::post('/location/toggle-status/{id}', [ZoneController::class, 'zoneWiseLocationStatus'])->name('location.status');
 		Route::post('/location/delete/{id}', [ZoneController::class, 'zoneWiseLocationDelete'])->name('location.delete');
+		Route::get('/export', [ZoneController::class, 'zoneWiseLocationExport'])->name('location.export');
+
 		
 		// zone wise employee
 		Route::get('/employee', [ZoneController::class, 'zoneWiseEmployeeIndex'])->name('employee.index');

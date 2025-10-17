@@ -21,6 +21,7 @@ class InspectionController extends Controller
             'checked_by'             => 'required|exists:users,id',
             'checked_date'           => 'required|date',
             'water_quality'          => 'required|in:good,poor',
+            'repairing'              => 'required|in:Floor,Machine',
             'electric_available'     => 'required|in:yes,no',
             'cooling_system'         => 'required|in:working,not working',
             'cleanliness'            => 'required|in:clean,dirty',
@@ -31,8 +32,33 @@ class InspectionController extends Controller
             'filter_condition'       => 'required|in:ok,not ok',
             'electric_usage_method'  => 'required|in:hooking,proper',
             'notes'                  => 'nullable|string|max:1000',
+            'images.*' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }
+
+        public function messages(): array
+    {
+        return [
+            'location_id.required' => 'Please select a location.',
+            'checked_by.required' => 'Please select the user who checked.',
+            'checked_date.required' => 'Please enter the inspection date.',
+            'water_quality.required' => 'Please select the water quality.',
+            'repairing.required' => 'Please select the repairing.',
+            'electric_available.required' => 'Please specify if electricity is available.',
+            'cooling_system.required' => 'Please specify the cooling system condition.',
+            'cleanliness.required' => 'Please specify cleanliness status.',
+            'tap_condition.required' => 'Please specify tap condition.',
+            'electric_meter_working.required' => 'Please specify electric meter condition.',
+            'compressor_condition.required' => 'Please specify compressor condition.',
+            'light_availability.required' => 'Please specify if light is available.',
+            'filter_condition.required' => 'Please specify filter condition.',
+            'electric_usage_method.required' => 'Please specify electric usage method.',
+
+            // 🖼️ Custom messages for images
+            'images.*.required' => 'Image field is required.',
+        ];
+    }
+
 
      public function index(Request $request)
     {
@@ -78,10 +104,27 @@ class InspectionController extends Controller
     }
 
     public function store(Request $request){
-       // dd($request->all());
-        $validated = $request->validate($this->rules());
+    //    dd($request->all());
+        $validated = $request->validate($this->rules(),$this->messages());
         $validated['created_by'] = auth()->id();
-        Inspection::create($validated);
+
+       $inspection = Inspection::create($validated);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                if ($image->isValid()) {
+                    $fileName = time() . rand(10000, 99999) . '.' . $image->extension();
+                    $filePath = 'uploads/inspection_galleries/' . $fileName;
+
+                    $image->move(public_path('uploads/inspection_galleries/'), $fileName);
+                   
+                    InspectionImage::create([
+                        'inspection_id' => $inspection->id,
+                        'image_path' => $filePath,
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('inspection.index')->with('success', 'Inspection saved successfully!');
     }
@@ -92,24 +135,51 @@ class InspectionController extends Controller
         $locations = Location::pluck('title', 'id'); // Adjust if needed
         $currentuserId = auth()->id();
         $checkUser = User::where('id', '!=', $currentuserId)->pluck('name', 'id');      // Adjust if needed
-       // dd($inspection);
+    //    dd($inspection);
 
         return view('admin.inspection.edit', compact('inspection', 'locations', 'checkUser'));
     }
 
     public function update(Request $request)
     {
-        //dd($request->all());
+        // dd($request->all());
         $request->validate([
             'id' => 'required|exists:inspections,id',
             'checked_by' => 'required|exists:users,id',
             'location_id' => 'required|exists:locations,id',
             'checked_date' => 'required|date',
-            
+            'new_images.*' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if ($value instanceof \Illuminate\Http\UploadedFile) {
+                        $ext = strtolower($value->getClientOriginalExtension());
+                        if (!in_array($ext, ['jpg', 'jpeg', 'png'])) {
+                            $fail('Each image must be a JPG, JPEG, or PNG file.');
+                        }
+                        if ($value->getSize() > 2048 * 1024) {
+                            $fail('Each image must not exceed 2MB.');
+                        }
+                    }
+                },
+            ],
         ]);
 
         $inspection = Inspection::findOrFail($request->id);
         $inspection->update($request->except(['_token']));
+         // Handle new image uploads
+        if ($request->hasFile('new_images')) {
+            foreach ($request->file('new_images') as $image) {
+                $fileName = time() . rand(10000, 99999) . '.' . $image->extension();
+                $filePath = 'uploads/inspection_galleries/' . $fileName;
+                $image->move(public_path('uploads/inspection_galleries/'), $fileName);
+
+                InspectionImage::create([
+                    'inspection_id' => $inspection->id,
+                    'image_path' => $filePath,
+                ]);
+            }
+        }
+
 
         return redirect()->route('inspection.index')->with('success', 'Inspection updated successfully.');
     }

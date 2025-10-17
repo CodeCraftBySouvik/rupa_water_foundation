@@ -240,25 +240,67 @@ class ZoneController extends Controller
     }
 
 
-    public function zoneWiseLocationIndex(Request $request){
-        $getZones = Zone::where('status','Active')->with(['zoneLocations.location_details'])->latest()->get();
-        $getLocations = Location::all();
-        $query  = ZoneWiseLocation::with('location_details')->latest();
+    // public function zoneWiseLocationIndex(Request $request){
+    //     $getZones = Zone::where('status','Active')->with(['zoneLocations.location_details'])->latest()->get();
+    //     $getLocations = Location::all();
+    //     $query  = ZoneWiseLocation::with(['location_details','zone_name'])->latest();
         
-         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('location_details', function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%");
-            })
-            ->orWhereHas('zone_name', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            });
+    //     //  if ($request->filled('search')) {
+    //     //     $search = $request->search;
+    //     //     $query->whereHas('location_details', function ($q) use ($search) {
+    //     //         $q->where('title', 'like', "%{$search}%");
+    //     //     })
+    //     //     ->orWhereHas('zone_name', function ($q) use ($search) {
+    //     //         $q->where('name', 'like', "%{$search}%");
+    //     //     });
+    //     // }
+    //      // ✅ Search logic fixed
+    //     if ($request->filled('search')) {
+    //         $search = $request->search;
+
+    //         $query->where(function ($q) use ($search) {
+    //             $q->whereHas('location_details', function ($q2) use ($search) {
+    //                 $q2->where('title', 'like', "%{$search}%");
+    //             })
+    //             ->orWhereHas('zone_name', function ($q2) use ($search) {
+    //                 $q2->where('name', 'like', "%{$search}%");
+    //             });
+    //         });
+    //     }
+
+    //     $locations = $query->get();
+
+    //     return view('admin.zone.location.index',compact('getZones','getLocations','locations'));
+    // }
+
+        public function zoneWiseLocationIndex(Request $request)
+    {
+        $search = $request->search;
+
+        // Get all zones
+        $getZones = Zone::where('status', 'Active')
+            ->with(['zoneLocations.location_details'])
+            ->latest()
+            ->get();
+
+        // ✅ If search term is present, filter the related locations
+        if ($search) {
+            foreach ($getZones as $zone) {
+                $zone->zoneLocations = $zone->zoneLocations->filter(function ($loc) use ($search) {
+                    return stripos($loc->location_details->title ?? '', $search) !== false ||
+                        stripos($loc->zone_name->name ?? '', $search) !== false;
+                });
+            }
+
+            // Remove zones that have no matching locations
+            $getZones = $getZones->filter(fn($zone) => $zone->zoneLocations->isNotEmpty());
         }
 
-        $locations = $query->get();
+        $getLocations = Location::all();
 
-        return view('admin.zone.location.index',compact('getZones','getLocations','locations'));
+        return view('admin.zone.location.index', compact('getZones', 'getLocations'));
     }
+
 
 
         public function zoneWiseLocationStore(Request $request)
@@ -398,14 +440,60 @@ class ZoneController extends Controller
     }
 
     public function zoneWiseLocationDelete($id){
-        $location = ZoneWiseLocation::findOrFail($id);
-        $location->delete();
+        $zoneWiseLocation  = ZoneWiseLocation::findOrFail($id);
+        //  Get the related location record
+        $location = $zoneWiseLocation->location_details;
+        // Delete the ZoneWiseLocation record
+        $zoneWiseLocation->delete();
+        
+        // Delete the related Location record (if exists)
+        if($location){
+          $location->delete();
+        }
 
         return response()->json([
               'success' => true,
               'message' => 'Zone location deleted successfully.'
         ]);
     }
+
+        public function zoneWiseLocationExport()
+    {
+        $fileName = 'zone_wise_locations_' . now()->format('Y_m_d_H_i_s') . '.csv';
+
+        // Fetch all ZoneWiseLocation data with relationships
+        $locations = ZoneWiseLocation::with(['zone_name', 'location_details'])
+            ->orderBy('zone_id')
+            ->get();
+
+        // Define the CSV headers
+        $columns = ['Zone Name', 'Location Title', 'Position', 'Opening Date', 'Status'];
+
+        // Prepare the CSV as a stream
+        $callback = function () use ($locations, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($locations as $loc) {
+                fputcsv($file, [
+                    $loc->zone_name->name ?? '—',
+                    $loc->location_details->title ?? '—',
+                    $loc->position ?? '—',
+                    $loc->opening_date ? \Carbon\Carbon::parse($loc->opening_date)->format('d-m-Y') : '—',
+                    ucfirst($loc->status ?? 'Inactive'),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        // Stream download
+        return response()->stream($callback, 200, [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename={$fileName}",
+        ]);
+    }
+
     
 
 
