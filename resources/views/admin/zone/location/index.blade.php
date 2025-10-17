@@ -38,9 +38,9 @@
                             data-bs-target="#importModal">
                             <i class="fas fa-file-csv me-1"></i> Import
                         </button>
-                        {{-- <a href="{{ route('zone.location.export') }}" class="btn btn-outline-primary btn-sm ms-2">
+                        <a href="{{ route('zone.location.export') }}" class="btn btn-outline-primary btn-sm ms-2">
                             <i class="fa fa-download"></i> Export CSV
-                        </a> --}}
+                        </a>
                         <button type="button" class="btn btn-outline-primary btn-sm ms-2" data-bs-toggle="modal"
                             data-bs-target="#addLocationModal">
                             <i class="fas fa-plus"></i> Add Location
