@@ -27,7 +27,7 @@
                                                 <img src="{{ asset($img) }}" class="img-fluid w-100 h-100 object-fit-cover"
                                                 >
                                             </a>
-                                        
+                                       
                                         {{-- delete X button --}}
                                         <form id="form-{{ $item->id }}-{{ $index }}" method="POST"
                                             action="{{ route('gallery.image.delete', [$item->id, $index]) }}"
@@ -41,7 +41,7 @@
 
                                     </div>
                                 </div>
-                                @endif
+                                 @endif
                                 @endforeach
                             </div>
 

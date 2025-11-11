@@ -43,8 +43,8 @@
                         <div
                             class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 end-0 text-center justify-content-center flex-column">
                             <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center overflow-hidden"
-                                style="background-image: url('{{asset('assets/images/logo-removebg-preview.png')}}');
-              background-size: cover;">
+                                style="background-image: url('{{asset('assets/images/pyaau-logo-login.png')}}');
+              background-size:50%; background-repeat:no-repeat; background-position:center center; background-color:#F3F8FC;">
                                 
                             </div>
                         </div>

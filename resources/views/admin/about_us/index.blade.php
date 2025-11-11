@@ -11,45 +11,64 @@
                 <div class="card-header pb-0">
                     <h6>About Content Table</h6>
                 </div>
+                <!--<div class="card-body px-0 pt-0 pb-2">-->
+                <!--    <div class="table-responsive p-0">-->
+                <!--        <table class="table align-items-center mb-0">-->
+                <!--            <thead>-->
+                <!--                <tr>-->
+                <!--                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">-->
+                <!--                        Title</th>-->
+                <!--                    <th-->
+                <!--                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">-->
+                <!--                        Description</th>-->
+                <!--                </tr>-->
+                <!--            </thead>-->
+                <!--            <tbody>-->
+                <!--                @if ($about)-->
+                <!--                <tr>-->
+                <!--                    <td style="white-space: normal; word-break: break-word;">-->
+                <!--                        <div class="d-flex px-2 py-1">-->
+                <!--                            <div class="d-flex flex-column justify-content-center">-->
+                <!--                                <h6 class="mb-0 text-sm">-->
+                <!--                                   {!! html_entity_decode($about->title) !!}-->
+                <!--                                </h6>-->
+                <!--                            </div>-->
+                <!--                        </div>-->
+                <!--                    </td>-->
+
+                <!--                    <td>-->
+                <!--                        <p class="text-xs font-weight-bold mb-0">{{strip_tags(Str::limit($about->description,60))}}-->
+                <!--                        </p>-->
+
+                <!--                    </td>-->
+                <!--                </tr>-->
+
+                <!--                @endif-->
+
+
+                <!--            </tbody>-->
+                <!--        </table>-->
+                <!--    </div>-->
+                <!--</div>-->
                 <div class="card-body px-0 pt-0 pb-2">
-                    <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Title</th>
-                                    <th
-                                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if ($about)
-                                <tr>
-                                    <td style="white-space: normal; word-break: break-word;">
-                                        <div class="d-flex px-2 py-1">
-                                            <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">
-                                                   {!! html_entity_decode($about->title) !!}
-                                                </h6>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    <td>
-                                        <p class="text-xs font-weight-bold mb-0">{{strip_tags(Str::limit($about->description,60))}}
-                                        </p>
-
-                                    </td>
-                                </tr>
-
-                                @endif
-
-
-                            </tbody>
-                        </table>
+                    <div class="p-3">
+                        @if ($about)
+                            <div class="d-flex flex-column justify-content-start">
+                                <h6>Title:</h6>
+                                <h6 class="text-sm mb-2">
+                                    {!! html_entity_decode($about->title) !!}
+                                </h6>
+                                <h6>Description:</h6>
+                                <p class="text-xs font-weight-bold mb-0">
+                                    {!! html_entity_decode($about->description) !!}
+                                </p>
+                            </div>
+                        @else
+                            <p class="text-muted text-sm m-3">No data available.</p>
+                        @endif
                     </div>
                 </div>
+
             </div>
         </div>
         {{-- --}}
@@ -84,7 +103,7 @@
                             </div>
 
                             <div class="col-md-2">
-                                <button type="submit" class="btn btn-primary btn-sm">Edit</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Save</button>
                             </div>
                         </div>
                     </div>
